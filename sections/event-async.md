@@ -1,28 +1,28 @@
-# 事件/异步
+# 事件/非同步
 
 * [`[Basic]` Promise](https://github.com/ElemeFE/node-interview/blob/master/sections/event-async.md#promise)
 * [`[Doc]` Events (事件)](https://github.com/ElemeFE/node-interview/blob/master/sections/event-async.md#events)
-* [`[Doc]` Timers (定时器)](https://github.com/ElemeFE/node-interview/blob/master/sections/event-async.md#timers)
-* [`[Point]` 阻塞/异步](https://github.com/ElemeFE/node-interview/blob/master/sections/event-async.md#阻塞异步)
-* [`[Point]` 并行/并发](https://github.com/ElemeFE/node-interview/blob/master/sections/event-async.md#并行并发)
+* [`[Doc]` Timers (定時器)](https://github.com/ElemeFE/node-interview/blob/master/sections/event-async.md#timers)
+* [`[Point]` 阻塞/非同步](https://github.com/ElemeFE/node-interview/blob/master/sections/event-async.md#阻塞非同步)
+* [`[Point]` 並行/併發](https://github.com/ElemeFE/node-interview/blob/master/sections/event-async.md#並行併發)
 
-## 简述
+## 簡述
 
-异步还是不异步? 这是一个问题.
+非同步還是不非同步? 這是一個問題.
 
 ## Promise
 
 ![callback-hell](/assets/callback-hell.jpg)
 
-相信很多同学在面试的时候都碰到过这样一个问题, `如何处理 Callback Hell`. 在早些年的时候, 大家会看到有很多的解决方案例如 [Q](https://www.npmjs.com/package/q), [async](https://www.npmjs.com/package/async), [EventProxy](https://www.npmjs.com/package/eventproxy) 等等. 最后从流行程度来看 `Promise` 当之无愧的独领风骚, 并且是在 ES6 的 Javascript 标准上赢得了支持.
+相信很多同學在面試的時候都碰到過這樣一個問題, `如何處理 Callback Hell`. 在早些年的時候, 大家會看到有很多的解決方案例如 [Q](https://www.npmjs.com/package/q), [async](https://www.npmjs.com/package/async), [EventProxy](https://www.npmjs.com/package/eventproxy) 等等. 最後從流行程度來看 `Promise` 當之無愧的獨領風騷, 並且是在 ES6 的 Javascript 標準上贏得了支援.
 
-关于它的基础知识/概念推荐看阮一峰的 [Promise 对象](http://javascript.ruanyifeng.com/advanced/promise.html#toc9) 这里就不多不赘述.
+關於它的基礎知識/概念推薦看阮一峰的 [Promise 物件](http://javascript.ruanyifeng.com/advanced/promise.html#toc9) 這裡就不多不贅述.
 
-> <a name="q-1"></a> Promise 中 .then 的第二参数与 .catch 有什么区别?
+> <a name="q-1"></a> Promise 中 .then 的第二參數與 .catch 有什麼區別?
 
-参见 [We have a problem with promises](https://pouchdb.com/2015/05/18/we-have-a-problem-with-promises.html)
+參見 [We have a problem with promises](https://pouchdb.com/2015/05/18/we-have-a-problem-with-promises.html)
 
-另外关于同步与异步, 有个问题希望大家看一下, 这是很简单的 Promise 的使用例子:
+另外關於同步與非同步, 有個問題希望大家看一下, 這是很簡單的 Promise 的使用例子:
 
 ```javascript
 let doSth = new Promise((resolve, reject) => {
@@ -35,16 +35,16 @@ doSth.then(() => {
 });
 ```
 
-毫无疑问的可以得到一下输出结果:
+毫無疑問的可以得到一下輸出結果:
 
 ```
 hello
 over
 ```
 
-但是首先的问题是, 该 Promise 封装的代码肯定是同步的, 那么这个 then 的执行是异步的吗?
+但是首先的問題是, 該 Promise 封裝的程式碼肯定是同步的, 那麼這個 then 的執行是非同步的嗎?
 
-其次的问题是, 如下代码, `setTimeout` 到 10s 之后再 `.then` 调用, 那么 `hello` 是会在 10s 之后在打印吗, 还是一开始就打印?
+其次的問題是, 如下程式碼, `setTimeout` 到 10s 之後再 `.then` 呼叫, 那麼 `hello` 是會在 10s 之後在列印嗎, 還是一開始就列印?
 
 ```javascript
 let doSth = new Promise((resolve, reject) => {
@@ -59,7 +59,7 @@ setTimeout(() => {
 }, 10000);
 ```
 
-以及理解如下代码的执行顺序 ([出处](https://zhuanlan.zhihu.com/p/25407758)):
+以及理解如下程式碼的執行順序 ([出處](https://zhuanlan.zhihu.com/p/25407758)):
 
 ```javascript
 setTimeout(function() {
@@ -77,21 +77,21 @@ new Promise(function executor(resolve) {
 console.log(5);
 ```
 
-如果你不了解这些问题, 可以自己在本地尝试研究一下打印的结果. 这里希望你掌握的是 Promise 的状态转换, 包括异步与 Promise 的关系, 以及 Promise 如何帮助你处理异步, 如果你研究过 Promise 的实现那就更好了.
+如果你不瞭解這些問題, 可以自己在本地嘗試研究一下列印的結果. 這裡希望你掌握的是 Promise 的狀態轉換, 包括非同步與 Promise 的關係, 以及 Promise 如何幫助你處理非同步, 如果你研究過 Promise 的實現那就更好了.
 
 ## Events
 
-`Events` 是 Node.js 中一个非常重要的 core 模块, 在 node 中有许多重要的 core API 都是依赖其建立的. 比如 `Stream` 是基于 `Events` 实现的, 而 `fs`, `net`, `http` 等模块都依赖 `Stream`, 所以 `Events` 模块的重要性可见一斑.
+`Events` 是 Node.js 中一個非常重要的 core 模組, 在 node 中有許多重要的 core API 都是依賴其建立的. 比如 `Stream` 是基於 `Events` 實現的, 而 `fs`, `net`, `http` 等模組都依賴 `Stream`, 所以 `Events` 模組的重要性可見一斑.
 
-通过继承 EventEmitter 来使得一个类具有 node 提供的基本的 event 方法, 这样的对象可以称作 emitter, 而触发(emit)事件的 cb 则称作 listener. 与前端 DOM 树上的事件并不相同,  emitter 的触发不存在冒泡, 逐层捕获等事件行为, 也没有处理事件传递的方法.
+通過繼承 EventEmitter 來使得一個類具有 node 提供的基本的 event 方法, 這樣的物件可以稱作 emitter, 而觸發(emit)事件的 cb 則稱作 listener. 與前端 DOM 樹上的事件並不相同,  emitter 的觸發不存在冒泡, 逐層捕獲等事件行為, 也沒有處理事件傳遞的方法.
 
-> <a name="q-2"></a> Eventemitter 的 emit 是同步还是异步?
+> <a name="q-2"></a> Eventemitter 的 emit 是同步還是非同步?
 
-Node.js 中 Eventemitter 的 emit 是同步的. 在官方文档中有说明:
+Node.js 中 Eventemitter 的 emit 是同步的. 在官方文件中有說明:
 
 > The EventListener calls all listeners synchronously in the order in which they were registered. This is important to ensure the proper sequencing of events and to avoid race conditions or logic errors.
 
-另外, 可以讨论如下的执行结果是输出 `hi 1` 还是 `hi 2`?
+另外, 可以討論如下的執行結果是輸出 `hi 1` 還是 `hi 2`?
 
 ```javascript
 const EventEmitter = require('events');
@@ -109,7 +109,7 @@ emitter.on('myEvent', () => {
 emitter.emit('myEvent');
 ```
 
-或者如下情况是否会死循环?
+或者如下情況是否會死迴圈?
 
 ```javascript
 const EventEmitter = require('events');
@@ -124,7 +124,7 @@ emitter.on('myEvent', () => {
 emitter.emit('myEvent');
 ```
 
-以及这样会不会死循环?
+以及這樣會不會死迴圈?
 
 ```javascript
 const EventEmitter = require('events');
@@ -139,27 +139,27 @@ emitter.on('myEvent', function sth () {
 emitter.emit('myEvent');
 ```
 
-使用 emitter 处理问题可以处理比较复杂的状态场景, 比如 TCP 的复杂状态机, 做多项异步操作的时候每一步都可能报错, 这个时候 .emit 错误并且执行某些 .once 的操作可以将你从泥沼中拯救出来.
+使用 emitter 處理問題可以處理比較複雜的狀態場景, 比如 TCP 的複雜狀態機, 做多項非同步操作的時候每一步都可能報錯, 這個時候 .emit 錯誤並且執行某些 .once 的操作可以將你從泥沼中拯救出來.
 
-另外可以注意一下的是, 有些同学喜欢用 emitter 来监控某些类的状态, 但是在这些类释放的时候可能会忘记释放 emitter, 而这些类的内部可能持有该 emitter 的 listener 的引用从而导致内存泄漏.
+另外可以注意一下的是, 有些同學喜歡用 emitter 來監控某些類的狀態, 但是在這些類釋放的時候可能會忘記釋放 emitter, 而這些類的內部可能持有該 emitter 的 listener 的引用從而導致記憶體洩漏.
 
-## 阻塞/异步
+## 阻塞/非同步
 
-> <a name="q-3"></a> 如何判断接口是否异步? 是否只要有回调函数就是异步? 
+> <a name="q-3"></a> 如何判斷介面是否非同步? 是否只要有回撥函數就是非同步?
 
-开放性问题, 每个写 node 的人都有一套自己的判断方式.
+開放性問題, 每個寫 node 的人都有一套自己的判斷方式.
 
-* 看文档
-* console.log 打印看看
+* 看文件
+* console.log 列印看看
 * 看是否有 IO 操作
 
-单纯使用回调函数并不会异步, IO 操作才可能会异步, 除此之外还有使用 setTimeout 等方式实现异步.
+單純使用回撥函數並不會非同步, IO 操作才可能會非同步, 除此之外還有使用 setTimeout 等方式實現非同步.
 
-> 有这样一个场景, 你在线上使用 koa 搭建了一个网站, 这个网站项目中有一个你同事写的接口 A, 而 A 接口中在特殊情况下会变成死循环. 那么首先问题是, 如果触发了这个死循环, 会对网站造成什么影响?
+> 有這樣一個場景, 你線上上使用 koa 搭建了一個網站, 這個網站項目中有一個你同事寫的介面 A, 而 A 介面中在特殊情況下會變成死迴圈. 那麼首先問題是, 如果觸發了這個死迴圈, 會對網站造成什麼影響?
 
-Node.js 中执行 js 代码的过程是单线程的. 只有当前代码都执行完, 才会切入事件循环, 然后从事件队列中 pop 出下一个回调函数开始执行代码. 所以 ① 实现一个 sleep 函数, 只要通过一个死循环就可以阻塞整个 js 的执行流程. (关于如何避免坑爹的同事写出死循环, 在后面的测试环节有写到.)
+Node.js 中執行 js 程式碼的過程是單執行緒的. 只有當前程式碼都執行完, 才會切入事件迴圈, 然後從事件佇列中 pop 出下一個回撥函數開始執行程式碼. 所以 ① 實現一個 sleep 函數, 只要通過一個死迴圈就可以阻塞整個 js 的執行流程. (關於如何避免坑爹的同事寫出死迴圈, 在後面的測試環節有寫到.)
 
-> <a name="q-5"></a> 如何实现一个 sleep 函数? ①
+> <a name="q-5"></a> 如何實現一個 sleep 函數? ①
 
 ```javascript
 function sleep(ms) {
@@ -169,21 +169,21 @@ function sleep(ms) {
 }
 ```
 
-而异步, 是使用 libuv 来实现的 (C/C++的同学可以参见 libev 和 libevent) 另一个线程里的事件队列.
+而非同步, 是使用 libuv 來實現的 (C/C++的同學可以參見 libev 和 libevent) 另一個執行緒裡的事件佇列.
 
-如果在线上的网站中出现了死循环的逻辑被触发, 整个进程就会一直卡在死循环中, 如果没有多进程部署的话, 之后的网站请求全部会超时, js 代码没有结束那么事件队列就会停下等待不会执行异步, 整个网站无法响应.
+如果線上上的網站中出現了死迴圈的邏輯被觸發, 整個程序就會一直卡在死迴圈中, 如果沒有多程序部署的話, 之後的網站請求全部會超時, js 程式碼沒有結束那麼事件佇列就會停下等待不會執行非同步, 整個網站無法響應.
 
-> <a name="q-6"></a> 如何实现一个异步的 reduce? (注:不是异步完了之后同步 reduce)
+> <a name="q-6"></a> 如何實現一個非同步的 reduce? (注:不是非同步完了之後同步 reduce)
 
-需要了解 reduce 的情况, 是第 n 个与 n+1 的结果异步处理完之后, 在用新的结果与第 n+2 个元素继续依次异步下去. 不贴答案, 期待诸君的版本.
+需要了解 reduce 的情況, 是第 n 個與 n+1 的結果非同步處理完之後, 在用新的結果與第 n+2 個元素繼續依次非同步下去. 不貼答案, 期待諸君的版本.
 
 ## Timers
 
-在笔者这里将 Node.js 中的异步简单的划分为两种, 硬异步和软异步. 
+在筆者這裡將 Node.js 中的非同步簡單的劃分為兩種, 硬非同步和軟非同步.
 
-硬异步是指由于 IO 操作或者外部调用走 libuv 而需要异步的情况. 当然, 也存在 readFileSync, execSync 等例外情况, 不过 node 由于是单线程的, 所以如果常规业务在普通时段执行可能比较耗时同步的 IO 操作会使得其执行过程中其他的所有操作都不能响应, 有点作死的感觉. 不过在启动/初始化以及一些工具脚本的应用场景下是完全没问题的. 而一般的场景下 IO 操作都是需要异步的.
+硬非同步是指由於 IO 操作或者外部呼叫走 libuv 而需要非同步的情況. 當然, 也存在 readFileSync, execSync 等例外情況, 不過 node 由於是單執行緒的, 所以如果常規業務在普通時段執行可能比較耗時同步的 IO 操作會使得其執行過程中其他的所有操作都不能響應, 有點作死的感覺. 不過在啟動/初始化以及一些工具指令碼的應用場景下是完全沒問題的. 而一般的場景下 IO 操作都是需要非同步的.
 
-软异步是指, 通过 setTimeout 等方式来实现的异步. <a name="q-4"></a> 关于 nextTick, setTimeout 以及 setImmediate 三者的区别参见[该帖](https://cnodejs.org/topic/5556efce7cabb7b45ee6bcac)
+軟非同步是指, 通過 setTimeout 等方式來實現的非同步. <a name="q-4"></a> 關於 nextTick, setTimeout 以及 setImmediate 三者的區別參見[該帖](https://cnodejs.org/topic/5556efce7cabb7b45ee6bcac)
 
 **Event loop 示例**
 
@@ -208,20 +208,20 @@ function sleep(ms) {
    └───────────────────────┘
 ```
 
-关于事件循环, Timers 以及 nextTick 的关系详见官方文档 [The Node.js Event Loop, Timers, and process.nextTick() (英文)](https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/) 以及阮一峰的 [JavaScript 运行机制详解：再谈Event Loop (中文)](http://www.ruanyifeng.com/blog/2014/10/event-loop.html) 等.
+關於事件迴圈, Timers 以及 nextTick 的關係詳見官方文件 [The Node.js Event Loop, Timers, and process.nextTick() (英文)](https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/) 以及阮一峰的 [JavaScript 執行機制詳解：再談Event Loop (中文)](http://www.ruanyifeng.com/blog/2014/10/event-loop.html) 等.
 
-## 并行/并发
+## 並行/併發
 
-并行 (Parallel) 与并发 (Concurrent) 是两个很常见的概念.
+並行 (Parallel) 與併發 (Concurrent) 是兩個很常見的概念.
 
-可以看 Erlang 作者 Joe Armstrong 的博客 ([Concurrent and Parallel](http://joearms.github.io/2013/04/05/concurrent-and-parallel-programming.html))
+可以看 Erlang 作者 Joe Armstrong 的部落格 ([Concurrent and Parallel](http://joearms.github.io/2013/04/05/concurrent-and-parallel-programming.html))
 
 ![con_and_par](http://joearms.github.io/images/con_and_par.jpg)
 
-并发 (Concurrent) = 2 队列对应 1 咖啡机.
+併發 (Concurrent) = 2 佇列對應 1 咖啡機.
 
-并行 (Parallel) = 2 队列对应 2 咖啡机.
+並行 (Parallel) = 2 佇列對應 2 咖啡機.
 
-Node.js 通过事件循环来挨个抽取实践队列中的一个个 Task 执行, 从而避免了传统的多线程情况下 `2个队列对应 1个咖啡机` 的时候上线文切换以及资源争抢/同步的问题, 所以获得了高并发的成就.
+Node.js 通過事件迴圈來挨個抽取實踐佇列中的一個個 Task 執行, 從而避免了傳統的多執行緒情況下 `2個佇列對應 1個咖啡機` 的時候上線文切換以及資源爭搶/同步的問題, 所以獲得了高併發的成就.
 
-至于在 node 中并行, 你可以通过 cluster 来再添加一个咖啡机.
+至於在 node 中並行, 你可以通過 cluster 來再新增一個咖啡機.

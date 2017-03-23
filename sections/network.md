@@ -1,145 +1,145 @@
 # Network
 
-* [`[Doc]` Net (网络)](#net)
+* [`[Doc]` Net (網路)](#net)
 * [`[Doc]` UDP/Datagram](#udp)
 * [`[Doc]` HTTP](#http)
-* [`[Doc]` DNS (域名服务器)](#dns)
-* [`[Doc]` ZLIB (压缩)](#zlib)
+* [`[Doc]` DNS (域名伺服器)](#dns)
+* [`[Doc]` ZLIB (壓縮)](#zlib)
 * [`[Point]` RPC](#rpc)
 
 
 ## Net
 
-目前互联化的核心是建立在 TCP/IP 协议的基础上的, 这些协议将数据分割成小的数据包进行传输, 并且解决传输过程中各种各样复杂的问题. 关于协议的具体细节推荐阅读 W.Richard Stevens 的[《TCP/IP 详解 卷1：协议》](https://www.amazon.cn/TCP-IP%E8%AF%A6%E8%A7%A3%E5%8D%B71-%E5%8D%8F%E8%AE%AE-W-Richard-Stevens/dp/B00116OTVS/), 本文不做赘述, 只是列举一些常见的知识点, 新人推荐看[《图解TCP/IP》](https://www.amazon.cn/%E5%9B%BE%E4%B9%A6/dp/B00DMS9990/), 抓包工具推荐看[《Wireshark网络分析就这么简单》](https://www.amazon.cn/%E5%9B%BE%E4%B9%A6/dp/B00PB5QQ84/).
+目前互聯化的核心是建立在 TCP/IP 協議的基礎上的, 這些協議將資料分割成小的資料包進行傳輸, 並且解決傳輸過程中各種各樣複雜的問題. 關於協議的具體細節推薦閱讀 W.Richard Stevens 的[《TCP/IP 詳解 卷1：協議》](https://www.amazon.cn/TCP-IP%E8%AF%A6%E8%A7%A3%E5%8D%B71-%E5%8D%8F%E8%AE%AE-W-Richard-Stevens/dp/B00116OTVS/), 本文不做贅述, 只是列舉一些常見的知識點, 新人推薦看[《圖解TCP/IP》](https://www.amazon.cn/%E5%9B%BE%E4%B9%A6/dp/B00DMS9990/), 抓包工具推薦看[《Wireshark網路分析就這麼簡單》](https://www.amazon.cn/%E5%9B%BE%E4%B9%A6/dp/B00PB5QQ84/).
 
 ### 粘包
 
-默认情况下, TCP 连接会启用延迟传送算法 (Nagle 算法), 在数据发送之前缓存他们. 如果短时间有多个数据发送, 会缓冲到一起作一次发送 (缓冲大小见 `socket.bufferSize`), 这样可以减少 IO 消耗提高性能.
+預設情況下, TCP 連線會啟用延遲傳送演算法 (Nagle 演算法), 在資料傳送之前快取他們. 如果短時間有多個資料傳送, 會緩衝到一起作一次傳送 (緩衝大小見 `socket.bufferSize`), 這樣可以減少 IO 消耗提高效能.
 
-如果是传输文件的话, 那么根本不用处理粘包的问题, 来一个包拼一个包就好了. 但是如果是多条消息, 或者是别的用途的数据那么久需要处理粘包.
+如果是傳輸檔案的話, 那麼根本不用處理粘包的問題, 來一個包拼一個包就好了. 但是如果是多條訊息, 或者是別的用途的資料那麼久需要處理粘包.
 
-可以参见网上流传比较广的一个例子, 连续调用两次 send 分别发送两段数据 data1 和 data2, 在接收端有以下几种常见的情况:
+可以參見網上流傳比較廣的一個例子, 連續呼叫兩次 send 分別傳送兩段資料 data1 和 data2, 在接收端有以下幾種常見的情況:
 
-* A. 先接收到 data1, 然后接收到 data2 .
-* B. 先接收到 data1 的部分数据, 然后接收到 data1 余下的部分以及 data2 的全部.
-* C. 先接收到了 data1 的全部数据和 data2 的部分数据, 然后接收到了 data2 的余下的数据.
-* D. 一次性接收到了 data1 和 data2 的全部数据.
+* A. 先接收到 data1, 然後接收到 data2 .
+* B. 先接收到 data1 的部分資料, 然後接收到 data1 餘下的部分以及 data2 的全部.
+* C. 先接收到了 data1 的全部資料和 data2 的部分資料, 然後接收到了 data2 的餘下的資料.
+* D. 一次性接收到了 data1 和 data2 的全部資料.
 
-其中的 BCD 就是我们常见的粘包的情况. 而对于处理粘包的问题, 常见的解决方案有:
+其中的 BCD 就是我們常見的粘包的情況. 而對於處理粘包的問題, 常見的解決方案有:
 
-* 1. 多次发送之前间隔一个等待时间
-* 2. 关闭 Nagle 算法
-* 3. 进行封包/拆包
+* 1. 多次傳送之前間隔一個等待時間
+* 2. 關閉 Nagle 演算法
+* 3. 進行封包/拆包
 
 ***方案1***
 
-只需要等上一段时间再进行下一次 send 就好, 适用于交互频率特别低的场景. 缺点也很明显, 对于比较频繁的场景而言传输效率实在太低. 不过几乎用做什么处理.
+只需要等上一段時間再進行下一次 send 就好, 適用於互動頻率特別低的場景. 缺點也很明顯, 對於比較頻繁的場景而言傳輸效率實在太低. 不過幾乎用做什麼處理.
 
 ***方案2***
 
-关闭 Nagle 算法, 在 Node.js 中你可以通过 [`socket.setNoDelay()`](https://nodejs.org/dist/latest-v6.x/docs/api/net.html#net_socket_setnodelay_nodelay) 方法来关闭 Nagle 算法, 让每一次 send 都不缓冲直接发送.
+關閉 Nagle 演算法, 在 Node.js 中你可以通過 [`socket.setNoDelay()`](https://nodejs.org/dist/latest-v6.x/docs/api/net.html#net_socket_setnodelay_nodelay) 方法來關閉 Nagle 演算法, 讓每一次 send 都不緩衝直接傳送.
 
-该方法比较适用于每次发送的数据都比较大 (但不是文件那么大), 并且频率不是特别高的场景. 如果是每次发送的数据量比较小, 并且频率特别高的, 关闭 Nagle 纯属自废武功.
+該方法比較適用於每次傳送的資料都比較大 (但不是檔案那麼大), 並且頻率不是特別高的場景. 如果是每次傳送的資料量比較小, 並且頻率特別高的, 關閉 Nagle 純屬自廢武功.
 
-另外, 该方法不适用于网络较差的情况, 因为 Nagle 算法是在服务端进行的包合并情况, 但是如果短时间内客户端的网络情况不好, 或者应用层由于某些原因不能及时将 TCP 的数据 recv, 就会造成多个包在客户端缓冲从而粘包的情况. (如果是在稳定的机房内部通信那么这个概率是比较小可以选择忽略的)
+另外, 該方法不適用於網路較差的情況, 因為 Nagle 演算法是在服務端進行的包合併情況, 但是如果短時間內客戶端的網路情況不好, 或者應用層由於某些原因不能及時將 TCP 的資料 recv, 就會造成多個包在客戶端緩衝從而粘包的情況. (如果是在穩定的機房內部通訊那麼這個概率是比較小可以選擇忽略的)
 
 ***方案3***
 
-封包/拆包是目前业内常见的解决方案了. 即给每个数据包在发送之前, 于其前/后放一些有特征的数据, 然后收到数据的时候根据特征数据分割出来各个数据包.
+封包/拆包是目前業內常見的解決方案了. 即給每個資料包在傳送之前, 於其前/後放一些有特徵的資料, 然後收到資料的時候根據特徵資料分割出來各個資料包.
 
-### 可靠传输
+### 可靠傳輸
 
-为每一个发送的数据包分配一个序列号(SYN, Synchronise packet), 每一个包在对方收到后要返回一个对应的应答数据包(ACK, Acknowledgedgement),. 发送方如果发现某个包没有被对方 ACK, 则会选择重发. 接收方通过 SYN 序号来保证数据的不会乱序(reordering), 发送方通过 ACK 来保证数据不缺漏, 以此参考决定是否重传. 关于具体的序号计算, 丢包时的重传机制等可以参见阅读陈皓的 [《TCP的那些事儿（上）》](http://coolshell.cn/articles/11564.html) 此处不做赘述.
+為每一個傳送的資料包分配一個序列號(SYN, Synchronise packet), 每一個包在對方收到後要返回一個對應的應答資料包(ACK, Acknowledgedgement),. 傳送方如果發現某個包沒有被對方 ACK, 則會選擇重發. 接收方通過 SYN 序號來保證資料的不會亂序(reordering), 傳送方通過 ACK 來保證資料不缺漏, 以此參考決定是否重傳. 關於具體的序號計算, 丟包時的重傳機制等可以參見閱讀陳皓的 [《TCP的那些事兒（上）》](http://coolshell.cn/articles/11564.html) 此處不做贅述.
 
 ### window
 
-TCP 头里有一个 Window 字段, 是接收端告诉发送端自己还有多少缓冲区可以接收数据的. 发送端就可以根据接收端的处理能力来发送数据, 从而避免接收端处理不过来. 详细参见陈皓的 [《TCP的那些事儿（下）》](http://coolshell.cn/articles/11609.html)
+TCP 頭裡有一個 Window 欄位, 是接收端告訴傳送端自己還有多少緩衝區可以接收資料的. 傳送端就可以根據接收端的處理能力來傳送資料, 從而避免接收端處理不過來. 詳細參見陳皓的 [《TCP的那些事兒（下）》](http://coolshell.cn/articles/11609.html)
 
-> window 是否设置的越大越好?
+> window 是否設定的越大越好?
 
-类似木桶理论, 一个木桶能装多少水, 是由最短的那块木板决定的. 一个 TCP 连接的 window 是由该连接中间一连串设备中 window 最小的那一个设备决定的.
+類似木桶理論, 一個木桶能裝多少水, 是由最短的那塊木板決定的. 一個 TCP 連線的 window 是由該連線中間一連串裝置中 window 最小的那一個裝置決定的.
 
 ### backlog
 
-![图片出处 http://www.cnxct.com/something-about-phpfpm-s-backlog/](/assets/socket-backlog.png)
+![圖片出處 http://www.cnxct.com/something-about-phpfpm-s-backlog/](/assets/socket-backlog.png)
 
-关于该 backlog 的定义参见 [man](https://linux.die.net/man/2/listen) 手册:
+關於該 backlog 的定義參見 [man](https://linux.die.net/man/2/listen) 手冊:
 
 > The behavior of the backlog argument on TCP sockets changed with Linux 2.2. Now it specifies the queue length for completely established sockets waiting to be accepted, instead of the number of incomplete connection requests.
 
-backlog 用于设置客户端与服务端 `ESTABLISHED` 之后等待 accept 的队列长图 (如上图中的 accept queue). 如果 backlog 过小, 在并发连接大的情况下容易导致 accept queue 装满之后断开连接. 但是如果将这个队列设置的特别大, 那么假定连接数并发量是 65525, 以 php-fpm 的 qps 5000 为例, 处理完约耗时 13s, 而这段时间中连接可能早已被 nginx 或者客户端断开, 那么我们去 accept 这个 socket 时只会拿到一个 broken pipe (该例子出处见 [PHP 源码 Set FPM_BACKLOG_DEFAULT to 511](https://github.com/php/php-src/commit/ebf4ffc9354f316f19c839a114b26a564033708a)). 经过<del>我也不懂的</del>计算 backlog 的长度默认是 511.
+backlog 用於設定客戶端與服務端 `ESTABLISHED` 之後等待 accept 的佇列長圖 (如上圖中的 accept queue). 如果 backlog 過小, 在併發連線大的情況下容易導致 accept queue 裝滿之後斷開連線. 但是如果將這個佇列設定的特別大, 那麼假定連線數併發量是 65525, 以 php-fpm 的 qps 5000 為例, 處理完約耗時 13s, 而這段時間中連線可能早已被 nginx 或者客戶端斷開, 那麼我們去 accept 這個 socket 時只會拿到一個 broken pipe (該例子出處見 [PHP 源碼 Set FPM_BACKLOG_DEFAULT to 511](https://github.com/php/php-src/commit/ebf4ffc9354f316f19c839a114b26a564033708a)). 經過<del>我也不懂的</del>計算 backlog 的長度預設是 511.
 
-另外提一句, 这个 backlog 是通过系统指定时是通过 `somaxconn` 参数来指定 accept queue 的. 而 `tcp_max_syn_backlog` 参数指定的是 SYN queue 的长度.
+另外提一句, 這個 backlog 是通過系統指定時是通過 `somaxconn` 參數來指定 accept queue 的. 而 `tcp_max_syn_backlog` 參數指定的是 SYN queue 的長度.
 
-### 状态机
+### 狀態機
 
 ![tcpfsm.png](/assets/tcpfsm.png)
 
-关于网络连接的建立以及断开, 存在着一个复杂的状态转换机制, 完整的状态表参见 [《The TCP/IP Guide》](http://www.tcpipguide.com/free/t_TCPOperationalOverviewandtheTCPFiniteStateMachineF-2.htm)
+關於網路連線的建立以及斷開, 存在著一個複雜的狀態轉換機制, 完整的狀態表參見 [《The TCP/IP Guide》](http://www.tcpipguide.com/free/t_TCPOperationalOverviewandtheTCPFiniteStateMachineF-2.htm)
 
-state|简述
+state|簡述
 -----|---
-CLOSED|连接关闭, 所有连接的初始状态
-LISTEN|监听状态, 等待客户端发送 SYN
-SYN-SENT|客户端发送了 SYN, 等待服务端回复
-SYN-RECEIVED|双方都收到了 SYN, 等待 ACK
-ESTABLISHED| SYN-RECEIVED 收到 ACK 之后, 状态切换为连接已建立.
-CLOSE-WAIT|被动方收到了关闭请求(FIN)后, 发送 ACK, 如果有数据要发送, 则发送数据, 无数据发送则回复 FIN. 状态切换到 LAST-ACK
-LAST-ACK|等待对方 ACK 当前设备的 CLOSE-WAIT 时发送的 FIN, 等到则切换 CLOSED
-FIN-WAIT-1|主动方发送 FIN, 等待 ACK
-FIN-WAIT-2|主动方收到被动方的 ACK, 等待 FIN
-CLOSING|主动方收到了FIN, 却没收到 FIN-WAIT-1 时发的 ACK, 此时等待那个 ACK
-TIME-WAIT|主动方收到 FIN, 返回收到对方 FIN 的 ACK, 等待对方是否真的收到了 ACK, 如果过一会又来一个 FIN, 表示对方没收到, 这时要再 ACK 一次
+CLOSED|連線關閉, 所有連線的初始狀態
+LISTEN|監聽狀態, 等待客戶端傳送 SYN
+SYN-SENT|客戶端傳送了 SYN, 等待服務端回覆
+SYN-RECEIVED|雙方都收到了 SYN, 等待 ACK
+ESTABLISHED| SYN-RECEIVED 收到 ACK 之後, 狀態切換為連線已建立.
+CLOSE-WAIT|被動方收到了關閉請求(FIN)後, 傳送 ACK, 如果有資料要傳送, 則傳送資料, 無資料傳送則回覆 FIN. 狀態切換到 LAST-ACK
+LAST-ACK|等待對方 ACK 當前裝置的 CLOSE-WAIT 時傳送的 FIN, 等到則切換 CLOSED
+FIN-WAIT-1|主動方傳送 FIN, 等待 ACK
+FIN-WAIT-2|主動方收到被動方的 ACK, 等待 FIN
+CLOSING|主動方收到了FIN, 卻沒收到 FIN-WAIT-1 時發的 ACK, 此時等待那個 ACK
+TIME-WAIT|主動方收到 FIN, 返回收到對方 FIN 的 ACK, 等待對方是否真的收到了 ACK, 如果過一會又來一個 FIN, 表示對方沒收到, 這時要再 ACK 一次
 
-> <a name="q-time-wait"></a> `TIME_WAIT` 是什么情况? 出现过多的 `TIME_WAIT` 可能是什么原因? 
+> <a name="q-time-wait"></a> `TIME_WAIT` 是什麼情況? 出現過多的 `TIME_WAIT` 可能是什麼原因?
 
-`TIME_WAIT` 是连接的某一方 (可能是服务端也可能是客户端) 主动断开连接时, 四次挥手等待被断开的一方是否收到最后一次挥手 (ACK) 的状态. 如果在等待时间中, 再次收到第三次挥手 (FIN) 表示对方没收到最后一次挥手, 这时要再 ACK 一次. 这个等待的作用是避免出现连接混用的情况 (`prevent potential overlap with new connections` see [TCP Connection Termination](http://www.tcpipguide.com/free/t_TCPConnectionTermination.htm) for more).
+`TIME_WAIT` 是連線的某一方 (可能是服務端也可能是客戶端) 主動斷開連線時, 四次揮手等待被斷開的一方是否收到最後一次揮手 (ACK) 的狀態. 如果在等待時間中, 再次收到第三次揮手 (FIN) 表示對方沒收到最後一次揮手, 這時要再 ACK 一次. 這個等待的作用是避免出現連線混用的情況 (`prevent potential overlap with new connections` see [TCP Connection Termination](http://www.tcpipguide.com/free/t_TCPConnectionTermination.htm) for more).
 
-出现大量的 `TIME_WAIT` 比较常见的情况是, 并发量大, 服务器在短时间断开了大量连接. 对应 HTTP server 的情况可能是没开启 `keepAlive`. 如果有开 `keepAlive`, 一般是等待客户端自己主动断开, 那么`TIME_WAIT` 就只存在客户端, 而服务端则是 `CLOSE_WAIT` 的状态, 如果服务端出现大量 `CLOSE_WAIT`, 意味着当前服务端建立的连接大面积的被断开, 可能是目标服务集群重启之类.
+出現大量的 `TIME_WAIT` 比較常見的情況是, 併發量大, 伺服器在短時間斷開了大量連線. 對應 HTTP server 的情況可能是沒開啟 `keepAlive`. 如果有開 `keepAlive`, 一般是等待客戶端自己主動斷開, 那麼`TIME_WAIT` 就只存在客戶端, 而服務端則是 `CLOSE_WAIT` 的狀態, 如果服務端出現大量 `CLOSE_WAIT`, 意味著當前服務端建立的連線大面積的被斷開, 可能是目標服務叢集重啟之類.
 
 
 ## UDP
 
-> <a name="q-tcp-udp"></a> TCP/UDP 的区别? UDP 有粘包吗?
+> <a name="q-tcp-udp"></a> TCP/UDP 的區別? UDP 有粘包嗎?
 
-协议|连接性|双工性|可靠性|有序性|有界性|拥塞控制|传输速度|量级|头部大小
+協議|連線性|雙工性|可靠性|有序性|有界性|擁塞控制|傳輸速度|量級|頭部大小
 ---|---|---|---|---|---|---|---|---|---
-TCP|面向连接<br>(Connection oriented)|全双工(1:1)|可靠<br>(重传机制)|有序<br>(通过SYN排序)|无, 有[粘包情况](#粘包)|有|慢|低|20~60字节
-UDP|无连接<br>(Connection less)|n:m|不可靠<br>(丢包后数据丢失)|无序|有消息边界, **无粘包**|无|快|高|8字节
+TCP|面向連線<br>(Connection oriented)|全雙工(1:1)|可靠<br>(重傳機制)|有序<br>(通過SYN排序)|無, 有[粘包情況](#粘包)|有|慢|低|20~60位元組
+UDP|無連線<br>(Connection less)|n:m|不可靠<br>(丟包後資料丟失)|無序|有訊息邊界, **無粘包**|無|快|高|8位元組
 
-UDP socket 支持 n 对 m 的连接状态, 在[官方文档](https://nodejs.org/dist/latest-v6.x/docs/api/dgram.html)中有写到在 `dgram.createSocket(options[, callback])` 中的 option 可以指定 `reuseAddr` 即 `SO_REUSEADDR`标志. 通过 `SO_REUSEADDR` 可以简单的实现 n 对 m 的多播特性 (不过仅在支持多播的系统上才有).
+UDP socket 支援 n 對 m 的連線狀態, 在[官方文件](https://nodejs.org/dist/latest-v6.x/docs/api/dgram.html)中有寫到在 `dgram.createSocket(options[, callback])` 中的 option 可以指定 `reuseAddr` 即 `SO_REUSEADDR`標誌. 通過 `SO_REUSEADDR` 可以簡單的實現 n 對 m 的多播特性 (不過僅在支援多播的系統上才有).
 
 
-### 常见的应用场景
+### 常見的應用場景
 
 <table>
-  <tr><th>传输层协议</th><th>应用</th><th>应用层协议</th></tr>
-  <tr><td rowspan="5">TCP</td><td>电子邮件</td><td>SMTP</td></tr>
-  <tr><td>终端连接</td><td>TELNET</td></tr>
-  <tr><td>终端连接</td><td>SSH</td></tr>
-  <tr><td>万维网</td><td>HTTP</td></tr>
-  <tr><td>文件传输</td><td>FTP</td></tr>
+  <tr><th>傳輸層協議</th><th>應用</th><th>應用層協議</th></tr>
+  <tr><td rowspan="5">TCP</td><td>電子郵件</td><td>SMTP</td></tr>
+  <tr><td>終端連線</td><td>TELNET</td></tr>
+  <tr><td>終端連線</td><td>SSH</td></tr>
+  <tr><td>全球資訊網</td><td>HTTP</td></tr>
+  <tr><td>檔案傳輸</td><td>FTP</td></tr>
   <tr><td rowspan="8">UDP</td><td>域名解析</td><td>DNS</td></tr>
-  <tr><td>简单文件传输</td><td>TFTP</td></tr>
-  <tr><td>网络时间校对</td><td>NTP</td></tr>
-  <tr><td>网络文件系统</td><td>NFS</td></tr>
-  <tr><td>路由选择</td><td>RIP</td></tr>
-  <tr><td>IP电话</td><td>-</td></tr>
-  <tr><td>流式多媒体通信</td><td>-</td></tr>
+  <tr><td>簡單檔案傳輸</td><td>TFTP</td></tr>
+  <tr><td>網路時間校對</td><td>NTP</td></tr>
+  <tr><td>網路檔案系統</td><td>NFS</td></tr>
+  <tr><td>路由選擇</td><td>RIP</td></tr>
+  <tr><td>IP電話</td><td>-</td></tr>
+  <tr><td>流式多媒體通訊</td><td>-</td></tr>
 </table>
 
-简单的说, UDP 速度快, 开销低, 不用封包/拆包允许丢一部分数据, 监控统计/日志数据上报/流媒体通信等场景都可以用 UDP. 目前 Node.js 的项目中使用 UDP 比较流行的是 [StatsD](https://github.com/etsy/statsd) 监控服务. 
+簡單的說, UDP 速度快, 開銷低, 不用封包/拆包允許丟一部分資料, 監控統計/日誌資料上報/流媒體通訊等場景都可以用 UDP. 目前 Node.js 的項目中使用 UDP 比較流行的是 [StatsD](https://github.com/etsy/statsd) 監控服務.
 
 
 ## HTTP
 
-目前世界上运行最良好的分布式集群, 莫过于当前的万维网了 (http servers) 了. 目前前端工程师也都是靠 HTTP 协议吃饭的, 所以 2-3 年的前端同学都应该对 HTTP 有比较深的理解了, 所以这里不做太多的赘述. 推荐书籍[《图解HTTP》](https://www.amazon.cn/%E5%9B%BE%E4%B9%A6/dp/B00JTQK1L4/), 博客[HTTP 协议入门](http://www.ruanyifeng.com/blog/2016/08/http.html).
+目前世界上執行最良好的分散式叢集, 莫過於當前的全球資訊網了 (http servers) 了. 目前前端工程師也都是靠 HTTP 協議吃飯的, 所以 2-3 年的前端同學都應該對 HTTP 有比較深的理解了, 所以這裡不做太多的贅述. 推薦書籍[《圖解HTTP》](https://www.amazon.cn/%E5%9B%BE%E4%B9%A6/dp/B00JTQK1L4/), 部落格[HTTP 協議入門](http://www.ruanyifeng.com/blog/2016/08/http.html).
 
-另外最近几年开始大家对 HTTP 的面试的考察也渐渐偏向[理解 RESTful 架构](http://www.ruanyifeng.com/blog/2011/09/restful.html). 简单的说, RESTful 是把每个 URI 当做资源 (Resources), 通过 method 作为动词来对资源做不同的动作, 然后服务器返回 status 来得知资源状态的变化 (State Transfer);
+另外最近幾年開始大家對 HTTP 的面試的考察也漸漸偏向[理解 RESTful 架構](http://www.ruanyifeng.com/blog/2011/09/restful.html). 簡單的說, RESTful 是把每個 URI 當做資源 (Resources), 通過 method 作為動詞來對資源做不同的動作, 然後伺服器返回 status 來得知資源狀態的變化 (State Transfer);
 
 ### method/status
 
-因为 HTTP 的方法 (method) 与状态码 (status) 讲解太常见, 你可以使用如下代码打印出来自己看 Node.js 官方定义的, 完整的就不列举了.
+因為 HTTP 的方法 (method) 與狀態碼 (status) 講解太常見, 你可以使用如下程式碼列印出來自己看 Node.js 官方定義的, 完整的就不列舉了.
 
 ```javascript
 const http = require('http');
@@ -148,9 +148,9 @@ console.log(http.METHODS);
 console.log(http.STATUS_CODES);
 ```
 
-一个常见的 method 列表, 关于这些 method 在 RESTful 中的一些应用的详细可以参见[Using HTTP Methods for RESTful Services](http://www.restapitutorial.com/lessons/httpmethods.html)
+一個常見的 method 列表, 關於這些 method 在 RESTful 中的一些應用的詳細可以參見[Using HTTP Methods for RESTful Services](http://www.restapitutorial.com/lessons/httpmethods.html)
 
-methods|CRUD|幂等|缓存
+methods|CRUD|冪等|快取
 ---|---|---|---
 GET|Read|✓|✓
 POST|Create||
@@ -158,37 +158,37 @@ PUT|Update/Replace|✓
 PATCH|Update/Modify|✓
 DELETE|Delete|✓
 
-> GET 和 POST 有什么区别?
+> GET 和 POST 有什麼區別?
 
-网上有很多讲这个的, 比如从书签, url 等前端的角度去看他们的区别这里不赘述. 而从后端的角度看, 前两年出来一个 《GET 和 POST 没有区别》(出处不好考究, 就没贴了) 的文章比较有名, 早在我刚学 PHP 的时候也有过这种疑惑, 刚学 Node 的时候发现不能像 PHP 那样同时处理 GET 和 POST 的时候还很不适应. 后来接触 RESTful 才意识到, 这两个东西最根本的差别是语义, 引申了看, 协议 (protocol) 这种东西就是人与人之间协商的约定, 什么行为是什么作用都是"约定"好的, 而不是强制使用的, 非要把 GET 当 POST 这样不遵守约定的做法我们也爱莫能助.
+網上有很多講這個的, 比如從書籤, url 等前端的角度去看他們的區別這裡不贅述. 而從後端的角度看, 前兩年出來一個 《GET 和 POST 沒有區別》(出處不好考究, 就沒貼了) 的文章比較有名, 早在我剛學 PHP 的時候也有過這種疑惑, 剛學 Node 的時候發現不能像 PHP 那樣同時處理 GET 和 POST 的時候還很不適應. 後來接觸 RESTful 才意識到, 這兩個東西最根本的差別是語義, 引申了看, 協議 (protocol) 這種東西就是人與人之間協商的約定, 什麼行為是什麼作用都是"約定"好的, 而不是強制使用的, 非要把 GET 當 POST 這樣不遵守約定的做法我們也愛莫能助.
 
-跑题了, 简而言之, 讨论这二者的区别最好从 RESTful 提倡的语义角度来讲<del>比较符合当代程序员的逼格</del>比较合理.
+跑題了, 簡而言之, 討論這二者的區別最好從 RESTful 提倡的語義角度來講<del>比較符合當代程式設計師的逼格</del>比較合理.
 
-> <a name="q-post-put"></a> POST 和 PUT 有什么区别?
+> <a name="q-post-put"></a> POST 和 PUT 有什麼區別?
 
-POST 是新建 (create) 资源, 非幂等, 同一个请求如果重复 POST 会新建多个资源. PUT 是 Update/Replace, 幂等, 同一个 PUT 请求重复操作会得到同样的结果.
+POST 是新建 (create) 資源, 非冪等, 同一個請求如果重複 POST 會新建多個資源. PUT 是 Update/Replace, 冪等, 同一個 PUT 請求重複操作會得到同樣的結果.
 
 
 ### headers
 
-HTTP headers 是在进行 HTTP 请求的交互过程中互相支会对方一些信息的主要字段. 比如请求 (Request) 的时候告诉服务端自己能接受的各项参数, 以及之前就存在本地的一些数据等. 详细各位可以参见 wikipedia:
+HTTP headers 是在進行 HTTP 請求的互動過程中互相支會對方一些資訊的主要欄位. 比如請求 (Request) 的時候告訴服務端自己能接受的各項參數, 以及之前就存在本地的一些資料等. 詳細各位可以參見 wikipedia:
 
 * [Request fields](https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#Request_fields)
 * [Response fields](https://en.wikipedia.org/wiki/List_of_HTTP_header_fields#Response_fields)
 
-> <a name="q-cookie-session"></a> cookie 与 session 的区别? 服务端如何清除 cookie?
+> <a name="q-cookie-session"></a> cookie 與 session 的區別? 服務端如何清除 cookie?
 
-主要区别在于, session 存在服务端, cookie 存在客户端. session 比 cookie 更安全. 而且 cookie 不一定一直能用 (可能被浏览器关掉). 服务端可以通过设置 cookie 的值为空并设置一个及时的 expires 来清除存在客户端上的 cookie.
+主要區別在於, session 存在服務端, cookie 存在客戶端. session 比 cookie 更安全. 而且 cookie 不一定一直能用 (可能被瀏覽器關掉). 服務端可以通過設定 cookie 的值為空並設定一個及時的 expires 來清除存在客戶端上的 cookie.
 
-> <a name="q-cors"></a> 什么是跨域请求? 如何允许跨域?
+> <a name="q-cors"></a> 什麼是跨域請求? 如何允許跨域?
 
-出于安全考虑, 默认情况下使用 XMLHttpRequest 和 Fetch 发起 HTTP 请求必须遵守同源策略, 即只能向相同域名请求. 向不同域名的请求被称作跨域请求 (cross-origin HTTP request). 可以通过设置 [CORS headers](https://developer.mozilla.org/en-US/docs/Glossary/CORS) 即 `Access-Control-Allow-` 系列来允许跨域. 例如:
+出於安全考慮, 預設情況下使用 XMLHttpRequest 和 Fetch 發起 HTTP 請求必須遵守同源策略, 即只能向相同域名請求. 向不同域名的請求被稱作跨域請求 (cross-origin HTTP request). 可以通過設定 [CORS headers](https://developer.mozilla.org/en-US/docs/Glossary/CORS) 即 `Access-Control-Allow-` 系列來允許跨域. 例如:
 
 ```
 location ~* ^/(?:v1|_) {
   if ($request_method = OPTIONS) { return 200 ''; }
   header_filter_by_lua '
-    ngx.header["Access-Control-Allow-Origin"] = ngx.var.http_origin; # 这样相当于允许所有来源了
+    ngx.header["Access-Control-Allow-Origin"] = ngx.var.http_origin; # 這樣相當於允許所有來源了
     ngx.header["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, PATCH, OPTIONS";
     ngx.header["Access-Control-Allow-Credentials"] = "true";
     ngx.header["Access-Control-Allow-Headers"] = "Content-Type";
@@ -197,28 +197,28 @@ location ~* ^/(?:v1|_) {
 }
 ```
 
-> `Script error.` 是什么错误? 如何拿到更详细的信息?
+> `Script error.` 是什麼錯誤? 如何拿到更詳細的資訊?
 
-接上题, 由于同源性策略 (CORS), 如果你引用的 js 脚本所在的域与当前域不同, 那么浏览器会把 onError 中的 msg 替换为 `Script error.` 要拿到详细错误的方法, 处理配好 `Access-Control-Allow-Origin` 还有在引用脚本的时候指定 `crossorigin` 例如:
+接上題, 由於同源性策略 (CORS), 如果你引用的 js 指令碼所在的域與當前域不同, 那麼瀏覽器會把 onError 中的 msg 替換為 `Script error.` 要拿到詳細錯誤的方法, 處理配好 `Access-Control-Allow-Origin` 還有在引用指令碼的時候指定 `crossorigin` 例如:
 
 ```html
 <script src="http://another-domain.com/app.js" crossorigin="anonymous"></script>
 ```
 
-详见 [Javascript Script Error.](https://sentry.io/answers/javascript-script-error/)
+詳見 [Javascript Script Error.](https://sentry.io/answers/javascript-script-error/)
 
 
 ### Agent
 
-Node.js 中的 `http.Agent` 用于池化 HTTP 客户端请求的 socket (pooling sockets used in HTTP client requests). 也就是复用 HTTP 请求时候的 socket. 如果你没有指定 Agent 的话, 默认用的是 `http.globalAgent`.
+Node.js 中的 `http.Agent` 用於池化 HTTP 客戶端請求的 socket (pooling sockets used in HTTP client requests). 也就是複用 HTTP 請求時候的 socket. 如果你沒有指定 Agent 的話, 預設用的是 `http.globalAgent`.
 
-另外最近发现一个 Agent 坑爹的地方, 当 `keepAlive` 为 true 是, 由于 socket 复用, 之前的事件监听如果忘了清除很容易导致重复监听, 并且旧的监听中的引用不会释放从导致内存泄漏, 参见这个 [issue](https://github.com/nodejs/node/issues/9268). (本组的同学有在整理这方面的文章, 请期待)
+另外最近發現一個 Agent 坑爹的地方, 當 `keepAlive` 為 true 是, 由於 socket 複用, 之前的事件監聽如果忘了清除很容易導致重複監聽, 並且舊的監聽中的引用不會釋放從導致記憶體洩漏, 參見這個 [issue](https://github.com/nodejs/node/issues/9268). (本組的同學有在整理這方面的文章, 請期待)
 
 ### socket hang up
 
-hang up 有挂断的意思, socket hang up 也可以理解为 socket 被挂断. 在 Node.js 中当你要 response 一个请求的时候, 发现该这个 socket 已经被 "挂断", 就会就会报 socket hang up 错误.
+hang up 有結束通話的意思, socket hang up 也可以理解為 socket 被結束通話. 在 Node.js 中當你要 response 一個請求的時候, 發現該這個 socket 已經被 "結束通話", 就會就會報 socket hang up 錯誤.
 
-[Node.js 中源码的情况:](https://github.com/nodejs/node/blob/v6.x/lib/_http_client.js#L286)
+[Node.js 中源碼的情況:](https://github.com/nodejs/node/blob/v6.x/lib/_http_client.js#L286)
 
 ```javascript
 function socketCloseListener() {
@@ -265,45 +265,45 @@ function socketCloseListener() {
 }
 ```
 
-典型的情况是用户使用浏览器, 请求的时间有点长, 然后用户简单的按了一下 F5 刷新页面. 这个操作会让浏览器取消之前的请求, 然后导致服务端 throw 了一个 socket hang up.
+典型的情況是使用者使用瀏覽器, 請求的時間有點長, 然後使用者簡單的按了一下 F5 重新整理頁面. 這個操作會讓瀏覽器取消之前的請求, 然後導致服務端 throw 了一個 socket hang up.
 
-详见万能的 stackoverflow: [NodeJS - What does “socket hang up” actually mean?](http://stackoverflow.com/questions/16995184/nodejs-what-does-socket-hang-up-actually-mean)
+詳見萬能的 stackoverflow: [NodeJS - What does “socket hang up” actually mean?](http://stackoverflow.com/questions/16995184/nodejs-what-does-socket-hang-up-actually-mean)
 
 
 ## DNS
 
-早期可以用 TCP/IP 通信之后, 有一个比较蛋疼的问题, 就是 ip 都是一串比较长的数字, 比较难记, 于是大家想了个办法, 给每个 ip 取个好记一点的名字比如 `Alan -> 192.168.0.11` 这样只需要记住好记的名字即可, 随着这个名字的规范化最终变成了今天的域名 (Domain name), 而帮助别人记录这个名字的服务就叫域名解析服务 (Domain Name Service).
+早期可以用 TCP/IP 通訊之後, 有一個比較蛋疼的問題, 就是 ip 都是一串比較長的數字, 比較難記, 於是大家想了個辦法, 給每個 ip 取個好記一點的名字比如 `Alan -> 192.168.0.11` 這樣只需要記住好記的名字即可, 隨著這個名字的規範化最終變成了今天的域名 (Domain name), 而幫助別人記錄這個名字的服務就叫域名解析服務 (Domain Name Service).
 
-DNS 服务主要基于 UDP, 这里简单介绍 Node.js 实现的接口中的两个方法:
+DNS 服務主要基於 UDP, 這裡簡單介紹 Node.js 實現的介面中的兩個方法:
 
-方法|功能|同步|网络请求|速度
+方法|功能|同步|網路請求|速度
 ---|---|---|---|---
-.lookup(hostname[, options], cb)|通过系统自带的 DNS 缓存 (如 `/etc/hosts`)|同步|无|快
-.resolve(hostname[, rrtype], cb)|通过系统配置的 DNS 服务器指定的记录 (rrtype指定)|异步|有|慢
+.lookup(hostname[, options], cb)|通過系統自帶的 DNS 快取 (如 `/etc/hosts`)|同步|無|快
+.resolve(hostname[, rrtype], cb)|通過系統配置的 DNS 伺服器指定的記錄 (rrtype指定)|非同步|有|慢
 
-> DNS 模块中 .lookup 与 .resolve 的区别?
+> DNS 模組中 .lookup 與 .resolve 的區別?
 
-当你要解析一个域名的 ip 时, 通过 .lookup 查询直接调用 `getaddrinfo` 来拿取地址, 速度很快, 但是如果本地的 hosts 文件被修改了, .lookup 就会拿 hosts 文件中的地方, 而 .resolve 依旧是外部正常的地址.
+當你要解析一個域名的 ip 時, 通過 .lookup 查詢直接呼叫 `getaddrinfo` 來拿取地址, 速度很快, 但是如果本地的 hosts 檔案被修改了, .lookup 就會拿 hosts 檔案中的地方, 而 .resolve 依舊是外部正常的地址.
 
-由于 .lookup 是同步的, 所以如果由于什么不可控的原因导致 `getaddrinfo` 缓慢或者阻塞是会影响整个 Node 进程的, 参见[文档](https://nodejs.org/dist/latest-v6.x/docs/api/dns.html#dns_dns_lookup).
+由於 .lookup 是同步的, 所以如果由於什麼不可控的原因導致 `getaddrinfo` 緩慢或者阻塞是會影響整個 Node 程序的, 參見[文件](https://nodejs.org/dist/latest-v6.x/docs/api/dns.html#dns_dns_lookup).
 
-> hosts 文件是什么? 什么叫 DNS 本地解析?
+> hosts 檔案是什麼? 什麼叫 DNS 本地解析?
 
-hosts 文件是个没有扩展名的系统文件，其作用就是将网址域名与其对应的 IP 地址建立一个关联“数据库”，当用户在浏览器中输入一个需要登录的网址时，系统会首先自动从 hosts 文件中寻找对应的IP地址。  
+hosts 檔案是個沒有副檔名的系統檔案，其作用就是將網址域名與其對應的 IP 地址建立一個關聯“資料庫”，當使用者在瀏覽器中輸入一個需要登入的網址時，系統會首先自動從 hosts 檔案中尋找對應的IP地址。
 
-当我们访问一个域名时，实际上需要的是访问对应的 IP 地址。这时候，获取 IP 地址的方式，先是读取浏览器缓存，如果未命中 => 接着读取本地 hosts 文件，如果还是未命中 => 则向 DNS 服务器发送请求获取。在向 DNS 服务器获取 IP 地址之前的行为，叫做 DNS 本地解析。 
+當我們訪問一個域名時，實際上需要的是訪問對應的 IP 地址。這時候，獲取 IP 地址的方式，先是讀取瀏覽器快取，如果未命中 => 接著讀取本地 hosts 檔案，如果還是未命中 => 則向 DNS 伺服器傳送請求獲取。在向 DNS 伺服器獲取 IP 地址之前的行為，叫做 DNS 本地解析。
 
 ## ZLIB
 
-在网络传输过程中, 如果网速稳定的情况下, 对数据进行压缩, 压缩比率越大, 那么传输的效率就越高等同于速度越快了. zlib 模块提供了 Gzip/Gunzip, Deflate/Inflate 和 DeflateRaw/InflateRaw 等压缩方法的类, 这些类接收相同的参数, 都属于可读写的 Stream 实例.
+在網路傳輸過程中, 如果網速穩定的情況下, 對資料進行壓縮, 壓縮比率越大, 那麼傳輸的效率就越高等同於速度越快了. zlib 模組提供了 Gzip/Gunzip, Deflate/Inflate 和 DeflateRaw/InflateRaw 等壓縮方法的類, 這些類接收相同的參數, 都屬於可讀寫的 Stream 例項.
 
 TODO
 
 ## RPC
 
-RPC (Remote Procedure Call Protocol) 基于 TCP/IP 来实现调用远程服务器的方法, 与 http 同属应用层. 常用于构建集群, 以及微服务 (推荐一本[《Node.js 微服务》](https://www.amazon.cn/%E5%9B%BE%E4%B9%A6/dp/B01MXY8ARP)<del>虽然我还没看完</del>)
+RPC (Remote Procedure Call Protocol) 基於 TCP/IP 來實現呼叫遠端伺服器的方法, 與 http 同屬應用層. 常用於構建叢集, 以及微服務 (推薦一本[《Node.js 微服務》](https://www.amazon.cn/%E5%9B%BE%E4%B9%A6/dp/B01MXY8ARP)<del>雖然我還沒看完</del>)
 
-常见的 RPC 方式:
+常見的 RPC 方式:
 
 * [Thrift](http://thrift.apache.org/)
 * HTTP
@@ -311,16 +311,16 @@ RPC (Remote Procedure Call Protocol) 基于 TCP/IP 来实现调用远程服务�
 
 ### Thrift
 
-> **Thrift**是一种[接口描述语言](https://zh.wikipedia.org/wiki/%E6%8E%A5%E5%8F%A3%E6%8F%8F%E8%BF%B0%E8%AF%AD%E8%A8%80 "接口描述语言")和二进制通讯协议，它被用来定义和创建跨语言的服务。它被当作一个[远程过程调用](https://zh.wikipedia.org/wiki/%E8%BF%9C%E7%A8%8B%E8%BF%87%E7%A8%8B%E8%B0%83%E7%94%A8 "远程过程调用")（RPC）框架来使用，是由[Facebook](https://zh.wikipedia.org/wiki/Facebook "Facebook")为“大规模跨语言服务开发”而开发的。它通过一个代码生成引擎联合了一个软件栈，来创建不同程度的、无缝的[跨平台](https://zh.wikipedia.org/wiki/%E8%B7%A8%E5%B9%B3%E5%8F%B0 "跨平台")高效服务，可以使用[C#](https://zh.wikipedia.org/wiki/C%E2%99%AF "C♯")、[C++](https://zh.wikipedia.org/wiki/C%2B%2B "C++")（基于[POSIX](https://zh.wikipedia.org/wiki/POSIX "POSIX")兼容系统）、Cappuccino、[Cocoa](https://zh.wikipedia.org/wiki/Cocoa "Cocoa")、[Delphi](https://zh.wikipedia.org/wiki/Delphi "Delphi")、[Erlang](https://zh.wikipedia.org/wiki/Erlang "Erlang")、[Go](https://zh.wikipedia.org/wiki/Go "Go")、[Haskell](https://zh.wikipedia.org/wiki/Haskell "Haskell")、[Java](https://zh.wikipedia.org/wiki/Java "Java")、[Node.js](https://zh.wikipedia.org/wiki/Node.js "Node.js")、[OCaml](https://zh.wikipedia.org/wiki/OCaml "OCaml")、[Perl](https://zh.wikipedia.org/wiki/Perl "Perl")、[PHP](https://zh.wikipedia.org/wiki/PHP "PHP")、[Python](https://zh.wikipedia.org/wiki/Python "Python")、[Ruby](https://zh.wikipedia.org/wiki/Ruby "Ruby")和[Smalltalk](https://zh.wikipedia.org/wiki/Smalltalk "Smalltalk")。虽然它以前是由Facebook开发的，但它现在是[Apache软件基金会](https://zh.wikipedia.org/wiki/Apache%E8%BD%AF%E4%BB%B6%E5%9F%BA%E9%87%91%E4%BC%9A "Apache软件基金会")的[开源](https://zh.wikipedia.org/wiki/%E5%BC%80%E6%BA%90 "开源")项目了。该实现被描述在2007年4月的一篇由Facebook发表的技术论文中，该论文现由Apache掌管。
+> **Thrift**是一種[介面描述語言](https://zh.wikipedia.org/wiki/%E6%8E%A5%E5%8F%A3%E6%8F%8F%E8%BF%B0%E8%AF%AD%E8%A8%80 "介面描述語言")和二進位制通訊協議，它被用來定義和建立跨語言的服務。它被當作一個[遠端過程呼叫](https://zh.wikipedia.org/wiki/%E8%BF%9C%E7%A8%8B%E8%BF%87%E7%A8%8B%E8%B0%83%E7%94%A8 "遠端過程呼叫")（RPC）框架來使用，是由[Facebook](https://zh.wikipedia.org/wiki/Facebook "Facebook")為“大規模跨語言服務開發”而開發的。它通過一個程式碼生成引擎聯合了一個軟體棧，來建立不同程度的、無縫的[跨平臺](https://zh.wikipedia.org/wiki/%E8%B7%A8%E5%B9%B3%E5%8F%B0 "跨平臺")高效服務，可以使用[C#](https://zh.wikipedia.org/wiki/C%E2%99%AF "C♯")、[C++](https://zh.wikipedia.org/wiki/C%2B%2B "C++")（基於[POSIX](https://zh.wikipedia.org/wiki/POSIX "POSIX")相容系統）、Cappuccino、[Cocoa](https://zh.wikipedia.org/wiki/Cocoa "Cocoa")、[Delphi](https://zh.wikipedia.org/wiki/Delphi "Delphi")、[Erlang](https://zh.wikipedia.org/wiki/Erlang "Erlang")、[Go](https://zh.wikipedia.org/wiki/Go "Go")、[Haskell](https://zh.wikipedia.org/wiki/Haskell "Haskell")、[Java](https://zh.wikipedia.org/wiki/Java "Java")、[Node.js](https://zh.wikipedia.org/wiki/Node.js "Node.js")、[OCaml](https://zh.wikipedia.org/wiki/OCaml "OCaml")、[Perl](https://zh.wikipedia.org/wiki/Perl "Perl")、[PHP](https://zh.wikipedia.org/wiki/PHP "PHP")、[Python](https://zh.wikipedia.org/wiki/Python "Python")、[Ruby](https://zh.wikipedia.org/wiki/Ruby "Ruby")和[Smalltalk](https://zh.wikipedia.org/wiki/Smalltalk "Smalltalk")。雖然它以前是由Facebook開發的，但它現在是[Apache軟體基金會](https://zh.wikipedia.org/wiki/Apache%E8%BD%AF%E4%BB%B6%E5%9F%BA%E9%87%91%E4%BC%9A "Apache軟體基金會")的[開源](https://zh.wikipedia.org/wiki/%E5%BC%80%E6%BA%90 "開源")項目了。該實現被描述在2007年4月的一篇由Facebook發表的技術論文中，該論文現由Apache掌管。
 
 ### HTTP
 
-使用 HTTP 协议来进行 RPC 调用也是很常见的, 相比 TCP 连接, 通过通过 HTTP 的方式性能会差一些, 但是在使用以及调试上会简单一些. 近期比较有名的框架参见 [gRPC](http://www.grpc.io/):
+使用 HTTP 協議來進行 RPC 呼叫也是很常見的, 相比 TCP 連線, 通過通過 HTTP 的方式效能會差一些, 但是在使用以及偵錯上會簡單一些. 近期比較有名的框架參見 [gRPC](http://www.grpc.io/):
 
 > gRPC is an open source remote procedure call (RPC) system initially developed at Google. It uses HTTP/2 for transport, Protocol Buffers as the interface description language, and provides features such as authentication, bidirectional streaming and flow control, blocking or nonblocking bindings, and cancellation and timeouts. It generates cross-platform client and server bindings for many languages.
 
 ### MQ
 
-使用消息队列 (Message Queue) 来进行 RPC 调用 (RPC over mq) 在业内有不少例子, 比较适合业务解耦/广播/限流等场景.
+使用訊息佇列 (Message Queue) 來進行 RPC 呼叫 (RPC over mq) 在業內有不少例子, 比較適合業務解耦/廣播/限流等場景.
 
 TODO

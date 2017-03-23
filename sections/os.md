@@ -1,17 +1,17 @@
 # OS
 
 * `[Doc]` TTY
-* `[Doc]` OS (操作系统)
-* `[Doc]` 命令行参数
-* `[Basic]` 负载
+* `[Doc]` OS (作業系統)
+* `[Doc]` 命令列參數
+* `[Basic]` 負載
 * `[Point]` CheckList
-* `[Basic]` 指标
+* `[Basic]` 指標
 
 ## TTY
 
-"tty" 原意是指 "teletype" 即打字机, "pty" 则是 "pseudo-teletype" 即伪打字机. 在 Unix 中, `/dev/tty*` 是指任何表现的像打字机的设备, 例如终端 (terminal).
+"tty" 原意是指 "teletype" 即打字機, "pty" 則是 "pseudo-teletype" 即偽打字機. 在 Unix 中, `/dev/tty*` 是指任何表現的像打字機的裝置, 例如終端 (terminal).
 
-你可以通过 `w` 命令查看当前登录的用户情况, 你会发现每登录了一个窗口就会有一个新的 tty.
+你可以通過 `w` 命令檢視當前登入的使用者情況, 你會發現每登入了一個視窗就會有一個新的 tty.
 
 ```shell
 $ w
@@ -22,7 +22,7 @@ dev      pts/2    10.0.128.252     11:08    2:07   0.17s  0.14s top
 root     pts/3    10.0.240.2       11:43    7.00s  0.04s  0.00s w
 ```
 
-使用 ps 命令查看进程信息中也有 tty 的信息:
+使用 ps 命令檢視程序資訊中也有 tty 的資訊:
 
 ```shell
 $ ps -x
@@ -35,9 +35,9 @@ $ ps -x
 23733 ?        Ssl    2:53 PM2 v1.1.2: God Daemon
 ```
 
-其中为 `?` 的是没有依赖 TTY 的进程, 即[守护进程](https://github.com/ElemeFE/node-interview/blob/master/sections/process.md#%E5%AE%88%E6%8A%A4%E8%BF%9B%E7%A8%8B).
+其中為 `?` 的是沒有依賴 TTY 的程序, 即[守護程序](https://github.com/ElemeFE/node-interview/blob/master/sections/process.md#%E5%AE%88%E6%8A%A4%E8%BF%9B%E7%A8%8B).
 
-在 Node.js 中你可以通过 stdio 的 isTTY 来判断当前进程是否处于 TTY (如终端) 的环境.
+在 Node.js 中你可以通過 stdio 的 isTTY 來判斷當前程序是否處於 TTY (如終端) 的環境.
 
 ```shell
 $ node -p -e "Boolean(process.stdout.isTTY)"
@@ -48,123 +48,123 @@ false
 
 ## OS
 
-通过 OS 模块可以获取到当前系统一些基础信息的辅助函数.
+通過 OS 模組可以獲取到當前系統一些基礎資訊的輔助函數.
 
-|属性|描述|
+|屬性|描述|
 |---|---|
-|os.EOL|根据当前系统, 返回当前系统的 `End Of Line`|
-|os.arch()|返回当前系统的 CPU 架构, 如 `'x86'` 和 `'x64'`|
-|os.constants|返回系统常量|
-|os.cpus()|返回 CPU 每个核的信息|
-|os.endianness()|返回 CPU 字节序, 如果是大端字节序返回 `BE`, 小端字节序则 `LE`|
-|os.freemem()|返回系统空闲内存的大小, 单位是字节|
-|os.homedir()|返回当前用户的根目录|
-|os.hostname()|返回当前系统的主机名|
-|os.loadavg()|返回负载信息|
-|os.networkInterfaces()|返回网卡信息 (类似 `ifconfig`)|
-|os.platform()|返回编译时指定的平台信息, 如 `win32`, `linux`, 同 `process.platform()`|
-|os.release()|返回操作系统的分发版本号|
-|os.tmpdir()|返回系统默认的临时文件夹|
-|os.totalmem()|返回总内存大小(同内存条大小)|
-|os.type()|根据 `[uname](https://en.wikipedia.org/wiki/Uname#Examples)` 返回系统的名称|
-|os.uptime()|返回系统的运行时间，单位是秒|
-|os.userInfo([options])|返回当前用户信息|
+|os.EOL|根據當前系統, 返回當前系統的 `End Of Line`|
+|os.arch()|返回當前系統的 CPU 架構, 如 `'x86'` 和 `'x64'`|
+|os.constants|返回系統常量|
+|os.cpus()|返回 CPU 每個核的資訊|
+|os.endianness()|返回 CPU 位元組序, 如果是大端位元組序返回 `BE`, 小端位元組序則 `LE`|
+|os.freemem()|返回系統空閒記憶體的大小, 單位是位元組|
+|os.homedir()|返回當前使用者的根目錄|
+|os.hostname()|返回當前系統的主機名|
+|os.loadavg()|返回負載資訊|
+|os.networkInterfaces()|返回網卡資訊 (類似 `ifconfig`)|
+|os.platform()|返回編譯時指定的平臺資訊, 如 `win32`, `linux`, 同 `process.platform()`|
+|os.release()|返回作業系統的分發版本號|
+|os.tmpdir()|返回系統預設的臨時資料夾|
+|os.totalmem()|返回總記憶體大小(同記憶體條大小)|
+|os.type()|根據 `[uname](https://en.wikipedia.org/wiki/Uname#Examples)` 返回系統的名稱|
+|os.uptime()|返回系統的執行時間，單位是秒|
+|os.userInfo([options])|返回當前使用者資訊|
 
-> 不同操作系统的换行符 (EOL) 有什么区别?
+> 不同作業系統的換行符 (EOL) 有什麼區別?
 
 end of line (EOL) 同 newline, line ending, 以及 line break.
 
-通常由 line feed (LF, `\n`) 和 carriage return (CR, `\r`) 组成. 常见的情况:
+通常由 line feed (LF, `\n`) 和 carriage return (CR, `\r`) 組成. 常見的情況:
 
-|符号|系统|
+|符號|系統|
 |---|---|
-|LF|在 Unix 或 Unix 相容系统 (GNU/Linux, AIX, Xenix, Mac OS X, ...)、BeOS、Amiga、RISC OS|
-|CR+LF|MS-DOS、微软视窗操作系统 (Microsoft Windows)、大部分非 Unix 的系统|
+|LF|在 Unix 或 Unix 相容系統 (GNU/Linux, AIX, Xenix, Mac OS X, ...)、BeOS、Amiga、RISC OS|
+|CR+LF|MS-DOS、微軟視窗作業系統 (Microsoft Windows)、大部分非 Unix 的系統|
 |CR|Apple II 家族, Mac OS 至版本9|
 
-如果不了解 EOL 跨系统的兼容情况, 那么在处理文件的行分割/行统计等情况时可能会被坑.
+如果不瞭解 EOL 跨系統的相容情況, 那麼在處理檔案的行分割/行統計等情況時可能會被坑.
 
 ### OS 常量
 
-* 信号常量 (Signal Constants), 如 `SIGHUP`, `SIGKILL` 等.
-* POSIX 错误常量 (POSIX Error Constants), 如 `EACCES`, `EADDRINUSE` 等.
-* Windows 错误常量 (Windows Specific Error Constants), 如 `WSAEACCES`, `WSAEBADF` 等.
-* libuv 常量 (libuv Constants), 仅 `UV_UDP_REUSEADDR`.
+* 訊號常量 (Signal Constants), 如 `SIGHUP`, `SIGKILL` 等.
+* POSIX 錯誤常量 (POSIX Error Constants), 如 `EACCES`, `EADDRINUSE` 等.
+* Windows 錯誤常量 (Windows Specific Error Constants), 如 `WSAEACCES`, `WSAEBADF` 等.
+* libuv 常量 (libuv Constants), 僅 `UV_UDP_REUSEADDR`.
 
-## 命令行参数
+## 命令列參數
 
-命令行参数 (Command Line Options), 即对 CLI 使用上的一些文档. 关于 CLI 主要有 4 种使用方式:
+命令列參數 (Command Line Options), 即對 CLI 使用上的一些文件. 關於 CLI 主要有 4 種使用方式:
 
 * node [options] [v8 options] [script.js | -e "script"] [arguments]
 * node debug [script.js | -e "script" | <host>:<port>] …
 * node --v8-options
-* 无参数直接启动 REPL 环境
+* 無參數直接啟動 REPL 環境
 
 ### Options
 
-|参数|简介|
+|參數|簡介|
 |---|---|
-|-v, --version|查看当前 node 版本|
-|-h, --help|查看帮助文档|
-|-e, --eval "script"|将参数字符串当做代码执行
-|-p, --print "script"|打印 `-e` 的返回值
-|-c, --check|检查语法并不执行
-|-i, --interactive|即使 stdin 不是终端也打开 REPL 模式
-|-r, --require module|在启动前预先 `require` 指定模块
-|--no-deprecation|关闭废弃模块警告
-|--trace-deprecation|打印废弃模块的堆栈跟踪信息
-|--throw-deprecation|执行废弃模块时抛出错误
-|--no-warnings|无视报警（包括废弃警告）
-|--trace-warnings|打印警告的 stack （包括废弃模块）
-|--trace-sync-io|只要检测到异步 I/O 出于 Event loop 的开头就打印 stack trace
-|--zero-fill-buffers|自动初始化(zero-fill) **Buffer** 和 **SlowBuffer**
-|--preserve-symlinks|在解析和缓存模块时指示模块加载程序保存符号链接
-|--track-heap-objects|为堆快照跟踪堆对象的分配情况
-|--prof-process|使用 v8 选项 `--prof` 生成 Profilling 报告
-|--v8-options|显示 v8 命令行选项
-|--tls-cipher-list=list|指明替代的默认 TLS 加密器列表
-|--enable-fips|在启动时开启 FIPS-compliant crypto
-|--force-fips|在启动时强制实施 FIPS-compliant
-|--openssl-config=file|启动时加载 OpenSSL 配置文件
-|--icu-data-dir=file|指定ICU数据加载路径
+|-v, --version|檢視當前 node 版本|
+|-h, --help|檢視幫助文件|
+|-e, --eval "script"|將參數字符串當做程式碼執行
+|-p, --print "script"|列印 `-e` 的返回值
+|-c, --check|檢查語法並不執行
+|-i, --interactive|即使 stdin 不是終端也開啟 REPL 模式
+|-r, --require module|在啟動前預先 `require` 指定模組
+|--no-deprecation|關閉廢棄模組警告
+|--trace-deprecation|列印廢棄模組的堆棧跟蹤資訊
+|--throw-deprecation|執行廢棄模組時拋出錯誤
+|--no-warnings|無視報警（包括廢棄警告）
+|--trace-warnings|列印警告的 stack （包括廢棄模組）
+|--trace-sync-io|只要檢測到非同步 I/O 出於 Event loop 的開頭就列印 stack trace
+|--zero-fill-buffers|自動初始化(zero-fill) **Buffer** 和 **SlowBuffer**
+|--preserve-symlinks|在解析和快取模組時指示模組載入程式儲存符號連結
+|--track-heap-objects|為堆快照跟蹤堆物件的分配情況
+|--prof-process|使用 v8 選項 `--prof` 生成 Profilling 報告
+|--v8-options|顯示 v8 命令列選項
+|--tls-cipher-list=list|指明替代的預設 TLS 加密器列表
+|--enable-fips|在啟動時開啟 FIPS-compliant crypto
+|--force-fips|在啟動時強制實施 FIPS-compliant
+|--openssl-config=file|啟動時載入 OpenSSL 配置檔案
+|--icu-data-dir=file|指定ICU資料載入路徑
 
-### 环境变量
+### 環境變數
 
-|环境变量|简介|
+|環境變數|簡介|
 |----|----|
-|`NODE_DEBUG=module[,…]`|指定要打印调试信息的核心模块列表
-|`NODE_PATH=path[:…]`|指定搜索目录模块路径的前缀列表
-|`NODE_DISABLE_COLORS=1`|关闭 REPL 的颜色显示
-|`NODE_ICU_DATA=file`|ICU (Intl object) 数据路径
-|`NODE_REPL_HISTORY=file`|持久化存储REPL历史文件的路径
-|`NODE_TTY_UNSAFE_ASYNC=1`|设置为1时, 将同步操作 stdio (如 console.log 变成同步)
-|`NODE_EXTRA_CA_CERTS=file`|指定 CA (如 VeriSign) 的额外证书路径
+|`NODE_DEBUG=module[,…]`|指定要列印偵錯資訊的核心模組列表
+|`NODE_PATH=path[:…]`|指定搜尋目錄模組路徑的字首列表
+|`NODE_DISABLE_COLORS=1`|關閉 REPL 的顏色顯示
+|`NODE_ICU_DATA=file`|ICU (Intl object) 資料路徑
+|`NODE_REPL_HISTORY=file`|持久化儲存REPL歷史檔案的路徑
+|`NODE_TTY_UNSAFE_ASYNC=1`|設定為1時, 將同步操作 stdio (如 console.log 變成同步)
+|`NODE_EXTRA_CA_CERTS=file`|指定 CA (如 VeriSign) 的額外證書路徑
 
-## 负载
+## 負載
 
-负载是衡量服务器运行状态的一个重要概念. 通过负载情况, 我们可以知道服务器目前状态是清闲, 良好, 繁忙还是即将 crash.
+負載是衡量伺服器執行狀態的一個重要概念. 通過負載情況, 我們可以知道伺服器目前狀態是清閒, 良好, 繁忙還是即將 crash.
 
-通常我们要查看的负载是 CPU 负载, 详细一点的情况你可以通过阅读这篇博客: [Understanding Linux CPU Load](http://blog.scoutapp.com/articles/2009/07/31/understanding-load-averages) 来了解.
+通常我們要檢視的負載是 CPU 負載, 詳細一點的情況你可以通過閱讀這篇部落格: [Understanding Linux CPU Load](http://blog.scoutapp.com/articles/2009/07/31/understanding-load-averages) 來了解.
 
-命令行上可以通过 `uptime`, `top` 命令, Node.js 中可以通过 `os.loadavg()` 来获取当前系统的负载情况:
+命令列上可以通過 `uptime`, `top` 命令, Node.js 中可以通過 `os.loadavg()` 來獲取當前系統的負載情況:
 
 ```
 load average: 0.09, 0.05, 0.01
 ```
 
-其中分别是最近 1 分钟, 5 分钟, 15 分钟内系统 CPU 的平均负载. 当 CPU 的一个核工作饱和的时候负载为 1, 有几核 CPU 那么饱和负载就是几.
+其中分別是最近 1 分鐘, 5 分鐘, 15 分鐘內系統 CPU 的平均負載. 當 CPU 的一個核工作飽和的時候負載為 1, 有幾核 CPU 那麼飽和負載就是幾.
 
-在 Node.js 中单个进程的 CPU 负载查看可以使用 [pidusage](https://github.com/soyuka/pidusage) 模块.
+在 Node.js 中單個程序的 CPU 負載檢視可以使用 [pidusage](https://github.com/soyuka/pidusage) 模組.
 
-除了 CPU 负载, 对于服务端 (偏维护) 还需要了解网络负载, 磁盘负载等.
+除了 CPU 負載, 對於服務端 (偏維護) 還需要了解網路負載, 磁碟負載等.
 
 ## CheckList
 
-> 有一个醉汉半夜在路灯下徘徊，路过的人奇怪地问他：“你在路灯下找什么？”醉汉回答：“我在找我的KEY”,路人更奇怪了：“找钥匙为什么在路灯下?”，醉汉说：“因为这里最亮！”。
+> 有一個醉漢半夜在路燈下徘徊，路過的人奇怪地問他：“你在路燈下找什麼？”醉漢回答：“我在找我的KEY”,路人更奇怪了：“找鑰匙為什麼在路燈下?”，醉漢說：“因為這裡最亮！”。
 
-很多服务端的同学在说到检查服务器状态时只知道使用 `top` 命令, 其实情况就和上面的笑话一样, 因为对于他们而言 `top` 是最亮的那盏路灯.
+很多服務端的同學在說到檢查伺服器狀態時只知道使用 `top` 命令, 其實情況就和上面的笑話一樣, 因為對於他們而言 `top` 是最亮的那盞路燈.
 
-对于服务端程序员而言, 完整的服务器 checklist 首推 [《性能之巅》](https://www.amazon.cn/%E5%9B%BE%E4%B9%A6/dp/B0140I5WPK) 第二章中讲述的 [USE 方法](http://www.brendangregg.com/USEmethod/use-linux.html).
+對於服務端程式設計師而言, 完整的伺服器 checklist 首推 [《效能之巔》](https://www.amazon.cn/%E5%9B%BE%E4%B9%A6/dp/B0140I5WPK) 第二章中講述的 [USE 方法](http://www.brendangregg.com/USEmethod/use-linux.html).
 
 The USE Method provides a strategy for performing a complete check of system health, identifying common bottlenecks and errors. For each system resource, metrics for utilization, saturation and errors are identified and checked. Any issues discovered are then investigated using further strategies.
 
@@ -242,22 +242,22 @@ This is an example USE-based metric list for Linux operating systems (eg, Ubuntu
 
 #### ulimit
 
-ulimit 用于管理用户对系统资源的访问.
+ulimit 用於管理使用者對系統資源的訪問.
 
 ```
--a   显示目前全部限制情况
--c   设定 core 文件的最大值, 单位为区块
--d   <数据节区大小> 程序数据节区的最大值, 单位为KB
--f   <文件大小> shell 所能建立的最大文件, 单位为区块
--H   设定资源的硬性限制, 也就是管理员所设下的限制
--m   <内存大小> 指定可使用内存的上限, 单位为 KB
--n   <文件描述符数目> 指定同一时间最多可开启的 fd 数
--p   <缓冲区大小> 指定管道缓冲区的大小, 单位512字节
--s   <堆叠大小> 指定堆叠的上限, 单位为 KB
--S   设定资源的弹性限制
--t   指定CPU使用时间的上限, 单位为秒
--u   <进程数目> 用户最多可开启的进程数目
--v   <虚拟内存大小> 指定可使用的虚拟内存上限, 单位为 KB
+-a   顯示目前全部限制情況
+-c   設定 core 檔案的最大值, 單位為區塊
+-d   <資料節區大小> 程式資料節區的最大值, 單位為KB
+-f   <檔案大小> shell 所能建立的最大檔案, 單位為區塊
+-H   設定資源的硬性限制, 也就是管理員所設下的限制
+-m   <記憶體大小> 指定可使用記憶體的上限, 單位為 KB
+-n   <檔案描述符數目> 指定同一時間最多可開啟的 fd 數
+-p   <緩衝區大小> 指定管道緩衝區的大小, 單位512位元組
+-s   <堆疊大小> 指定堆疊的上限, 單位為 KB
+-S   設定資源的彈性限制
+-t   指定CPU使用時間的上限, 單位為秒
+-u   <程序數目> 使用者最多可開啟的程序數目
+-v   <虛擬記憶體大小> 指定可使用的虛擬記憶體上限, 單位為 KB
 ```
 
 例如:
@@ -282,5 +282,4 @@ virtual memory          (kbytes, -v) unlimited
 file locks                      (-x) unlimited
 ```
 
-注意, open socket 等资源拿到的也是 fd, 所以 `ulimit -n` 比较小除了文件打不开, 还可能建立不了 socket 链接.
-
+注意, open socket 等資源拿到的也是 fd, 所以 `ulimit -n` 比較小除了檔案打不開, 還可能建立不了 socket 連結.

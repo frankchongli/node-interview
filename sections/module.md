@@ -1,29 +1,29 @@
-# 模块
+# 模組
 
-* [`[Basic]` 模块机制](https://github.com/ElemeFE/node-interview/blob/master/sections/module.md#模块机制)
-* [`[Basic]` 热更新](https://github.com/ElemeFE/node-interview/blob/master/sections/module.md#热更新)
+* [`[Basic]` 模組機制](https://github.com/ElemeFE/node-interview/blob/master/sections/module.md#模組機制)
+* [`[Basic]` 熱更新](https://github.com/ElemeFE/node-interview/blob/master/sections/module.md#熱更新)
 * [`[Basic]` 上下文](https://github.com/ElemeFE/node-interview/blob/master/sections/module.md#上下文)
 
-## 常见问题
+## 常見問題
 
 
-> <a name="q-hot"></a> 如何在不重启 node 进程的情况下热更新一个 js/json 文件? 这个问题本身是否有问题?
+> <a name="q-hot"></a> 如何在不重啟 node 程序的情況下熱更新一個 js/json 檔案? 這個問題本身是否有問題?
 
-可以清除掉 `require.cache` 的缓存重新 `require(xxx)`, 视具体情况还可以用 VM 模块重新执行.
+可以清除掉 `require.cache` 的快取重新 `require(xxx)`, 視具體情況還可以用 VM 模組重新執行.
 
-当然这个问题可能是典型的 [`X-Y Problem`](http://coolshell.cn/articles/10804.html), 使用 js 实现热更新很容易碰到 v8 优化之后各地拿到缓存的引用导致热更新 js 没意义. 当然热更新 json 还是可以简单一点比如用读取文件的方式来热更新, 但是这样也不如从 redis 之类的数据库中读取比较合理.
+當然這個問題可能是典型的 [`X-Y Problem`](http://coolshell.cn/articles/10804.html), 使用 js 實現熱更新很容易碰到 v8 優化之後各地拿到快取的引用導致熱更新 js 沒意義. 當然熱更新 json 還是可以簡單一點比如用讀取檔案的方式來熱更新, 但是這樣也不如從 redis 之類的資料庫中讀取比較合理.
 
-## 简述
+## 簡述
 
-其他还有很多内容也是属于很 '基础' 的 Node.js 问题 (例如异步/线程等等), 但是由于归类的问题并没有放在这个分类中. 所以这里只简单讲几个之后没归类的基础问题.
+其他還有很多內容也是屬於很 '基礎' 的 Node.js 問題 (例如非同步/執行緒等等), 但是由於歸類的問題並沒有放在這個分類中. 所以這裡只簡單講幾個之後沒歸類的基礎問題.
 
-### 模块机制
+### 模組機制
 
-node 的基础中毫无疑问的应该是有关于模块机制的方面的, 也即 `require` 这个内置功能的一些原理的问题.
+node 的基礎中毫無疑問的應該是有關於模組機制的方面的, 也即 `require` 這個內建功能的一些原理的問題.
 
-关于模块互相引用之类的, 不了解的推荐先好好读读[官方文档](https://nodejs.org/dist/latest-v6.x/docs/api/modules.html).
+關於模組互相引用之類的, 不瞭解的推薦先好好讀讀[官方文件](https://nodejs.org/dist/latest-v6.x/docs/api/modules.html).
 
-其实官方文档已经说得很清楚了, 每个 node 进程只有一个 VM 的上下文, 不会跟浏览器相差多少, 模块机制在文档中也描述的非常清楚了:
+其實官方文件已經說得很清楚了, 每個 node 程序只有一個 VM 的上下文, 不會跟瀏覽器相差多少, 模組機制在文件中也描述的非常清楚了:
 
 ```javascript
 function require(...) {
@@ -42,9 +42,9 @@ function require(...) {
 }
 ```
 
-> <a name="q-global"></a> 如果 a.js require 了 b.js, 那么在 b 中定义全局变量 `t = 111` 能否在 a 中直接打印出来?
+> <a name="q-global"></a> 如果 a.js require 了 b.js, 那麼在 b 中定義全局變數 `t = 111` 能否在 a 中直接列印出來?
 
-① 每个 `.js` 能独立一个环境只是因为 node 帮你在外层包了一圈自执行, 所以你使用 `t = 111` 定义全局变量在其他地方当然能拿到. 情况如下:
+① 每個 `.js` 能獨立一個環境只是因為 node 幫你在外層包了一圈自執行, 所以你使用 `t = 111` 定義全局變數在其他地方當然能拿到. 情況如下:
 
 ```javascript
 
@@ -60,33 +60,33 @@ function require(...) {
 })();
 ```
 
-> <a name="q-loop"></a> a.js 和 b.js 两个文件互相 require 是否会死循环? 双方是否能导出变量? 如何从设计上避免这种问题?
+> <a name="q-loop"></a> a.js 和 b.js 兩個檔案互相 require 是否會死迴圈? 雙方是否能匯出變數? 如何從設計上避免這種問題?
 
-② 不会, 先执行的导出空对象, 通过导出工厂函数让对方从函数去拿比较好避免. 模块在导出的只是 `var module = { exports: {} };` 中的 exports, 以从 a.js 启动为例, a.js 还没执行完 exports 就是 `{}` 在 b.js 的开头拿到的就是 `{}` 而已.
+② 不會, 先執行的匯出空物件, 通過匯出工廠函數讓對方從函數去拿比較好避免. 模組在匯出的只是 `var module = { exports: {} };` 中的 exports, 以從 a.js 啟動為例, a.js 還沒執行完 exports 就是 `{}` 在 b.js 的開頭拿到的就是 `{}` 而已.
 
-另外还有非常基础和常见的问题, 比如 module.exports 和 exports 的区别这里也能一并解决了 exports 只是 module.exports 的一个引用. 没看懂可以在细看我以前发的[帖子](https://cnodejs.org/topic/5734017ac3e4ef7657ab1215).
+另外還有非常基礎和常見的問題, 比如 module.exports 和 exports 的區別這裡也能一併解決了 exports 只是 module.exports 的一個引用. 沒看懂可以在細看我以前發的[帖子](https://cnodejs.org/topic/5734017ac3e4ef7657ab1215).
 
-再晋级一点, 众所周知, node 的模块机制是基于 [`CommonJS`](http://javascript.ruanyifeng.com/nodejs/module.html) 规范的. 对于从前端转 node 的同学, 如果面试官想问的难一点会考验关于 [`CommonJS`](http://javascript.ruanyifeng.com/nodejs/module.html) 的一些问题. 比如比较 `AMD`, `CMD`, [`CommonJS`](http://javascript.ruanyifeng.com/nodejs/module.html) 三者的区别, 包括询问关于 node 中 `require` 的实现原理等.
+再晉級一點, 眾所周知, node 的模組機制是基於 [`CommonJS`](http://javascript.ruanyifeng.com/nodejs/module.html) 規範的. 對於從前端轉 node 的同學, 如果面試官想問的難一點會考驗關於 [`CommonJS`](http://javascript.ruanyifeng.com/nodejs/module.html) 的一些問題. 比如比較 `AMD`, `CMD`, [`CommonJS`](http://javascript.ruanyifeng.com/nodejs/module.html) 三者的區別, 包括詢問關於 node 中 `require` 的實現原理等.
 
-### 热更新
+### 熱更新
 
-从面试官的角度看, `热更新` 是很多程序常见的问题. 对客户端而言, 热更新意味着不用换包, 当然也包含着 md5 校验/差异更新等复杂问题; 对服务端而言, 热更新意味着服务不用重启, 这样可用性较高<del>同时也优雅和有逼格</del>. 问的过程中可以一定程度的暴露应聘程序员的水平.
+從面試官的角度看, `熱更新` 是很多程式常見的問題. 對客戶端而言, 熱更新意味著不用換包, 當然也包含著 md5 校驗/差異更新等複雜問題; 對服務端而言, 熱更新意味著服務不用重啟, 這樣可用性較高<del>同時也優雅和有逼格</del>. 問的過程中可以一定程度的暴露應聘程式設計師的水平.
 
-从 PHP 转 node 的同学可能会有些想法, 比如 PHP 的代码直接刷上去就好了, 并没有所谓的重启. 而 node 重启看起来动作还挺大. 当然这里面的区别, 主要是与同时有 PHP 与 node 开发经验的同学可以讨论, 也是很好的切入点.
+從 PHP 轉 node 的同學可能會有些想法, 比如 PHP 的程式碼直接刷上去就好了, 並沒有所謂的重啟. 而 node 重啟看起來動作還挺大. 當然這裡面的區別, 主要是與同時有 PHP 與 node 開發經驗的同學可以討論, 也是很好的切入點.
 
-在 Node.js 中做热更新代码, 牵扯到的知识点可能主要是 `require` 会有一个 `cache`, 有这个 `cache` 在, 即使你更新了 `.js` 文件, 在代码中再次 `require` 还是会拿到之前的编译好缓存在 v8 内存 (code space) 中的的旧代码. 但是如果只是单纯的清除掉 `require` 中的 `cache`, 再次 `require` 确实能拿到新的代码, 但是这时候很容易碰到各地维持旧的引用依旧跑的旧的代码的问题. 如果还要继续推行这种热更新代码的话, 可能要推翻当前的架构, 从头开始从新设计一下目前的框架.
+在 Node.js 中做熱更新程式碼, 牽扯到的知識點可能主要是 `require` 會有一個 `cache`, 有這個 `cache` 在, 即使你更新了 `.js` 檔案, 在程式碼中再次 `require` 還是會拿到之前的編譯好快取在 v8 記憶體 (code space) 中的的舊程式碼. 但是如果只是單純的清除掉 `require` 中的 `cache`, 再次 `require` 確實能拿到新的程式碼, 但是這時候很容易碰到各地維持舊的引用依舊跑的舊的程式碼的問題. 如果還要繼續推行這種熱更新程式碼的話, 可能要推翻當前的架構, 從頭開始從新設計一下目前的框架.
 
-不过热更新 json 之类的配置文件的话, 还是可以简单的实现的, 更新 `require` 的 `cache` 可以实现, 不会有持有旧引用的问题, 可以参见我 2 年前写着玩的[例子](https://www.npmjs.com/package/auto-reload), 但是如果旧的引用一直被持有很容易出现内存泄漏, 而要热更新配置的话, 为什么不存数据库? 或者用 `zookeeper` 之类的服务? 通过更新文件还要再发布一次, 但是存数据库直接写个接口配个界面多爽你说是不是?
+不過熱更新 json 之類的配置檔案的話, 還是可以簡單的實現的, 更新 `require` 的 `cache` 可以實現, 不會有持有舊引用的問題, 可以參見我 2 年前寫著玩的[例子](https://www.npmjs.com/package/auto-reload), 但是如果舊的引用一直被持有很容易出現記憶體洩漏, 而要熱更新配置的話, 為什麼不存資料庫? 或者用 `zookeeper` 之類的服務? 通過更新檔案還要再發布一次, 但是存資料庫直接寫個介面配個介面多爽你說是不是?
 
-所以这个问题其实本身其实是值得商榷的, 可能是典型的 [`X-Y Problem`](http://coolshell.cn/articles/10804.html), 不过聊起来确实是可以暴露水平.
+所以這個問題其實本身其實是值得商榷的, 可能是典型的 [`X-Y Problem`](http://coolshell.cn/articles/10804.html), 不過聊起來確實是可以暴露水平.
 
 ### 上下文
 
-如果你已经了解 ①② 那么你也应该了解, 对于 Node.js 而言, 正常情况下只有一个上下文, 甚至于内置的很多方面例如 `require` 的实现只是在启动的时候运行了[内置的函数](https://github.com/nodejs/node/tree/master/lib). 
+如果你已經瞭解 ①② 那麼你也應該瞭解, 對於 Node.js 而言, 正常情況下只有一個上下文, 甚至於內建的很多方面例如 `require` 的實現只是在啟動的時候執行了[內建的函數](https://github.com/nodejs/node/tree/master/lib).
 
-每个单独的 `.js` 文件并不意味着单独的上下文, 在某个 `.js` 文件中污染了全局的作用域一样能影响到其他的地方.
+每個單獨的 `.js` 檔案並不意味著單獨的上下文, 在某個 `.js` 檔案中汙染了全局的作用域一樣能影響到其他的地方.
 
-而目前的 Node.js 将 VM 的接口暴露了出来, 可以让你自己创建一个新的 js 上下文, 这一点上跟前端 js 还是区别挺大的. 在执行外部代码的时候, 通过创建新的上下文沙盒 (sandbox) 可以避免上下文被污染:
+而目前的 Node.js 將 VM 的介面暴露了出來, 可以讓你自己建立一個新的 js 上下文, 這一點上跟前端 js 還是區別挺大的. 在執行外部程式碼的時候, 通過建立新的上下文沙盒 (sandbox) 可以避免上下文被汙染:
 
 ```javascript
 'use strict';
@@ -108,6 +108,6 @@ let code =
 vm.runInThisContext(code)(require);
 ```
 
-这种执行方式与 eval 和 Function 有明显的区别. 关于 VM 更多的一些接口可以先阅读[官方文档 VM (虚拟机)](https://nodejs.org/dist/latest-v6.x/docs/api/vm.html)
+這種執行方式與 eval 和 Function 有明顯的區別. 關於 VM 更多的一些介面可以先閱讀[官方文件 VM (虛擬機器)](https://nodejs.org/dist/latest-v6.x/docs/api/vm.html)
 
-讲完这个知识点, 这里留下一个简单的问题, 既然可以通过新的上下文来避免污染, 那么`为什么 Node.js 不给每一个 `.js` 文件以独立的上下文来避免作用域被污染?` <del>(反应不过来的同学还是别投简历了, 微笑脸)</del>
+講完這個知識點, 這裡留下一個簡單的問題, 既然可以通過新的上下文來避免汙染, 那麼`為什麼 Node.js 不給每一個 `.js` 檔案以獨立的上下文來避免作用域被汙染?` <del>(反應不過來的同學還是別投簡歷了, 微笑臉)</del>

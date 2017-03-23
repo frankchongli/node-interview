@@ -1,35 +1,35 @@
-# 错误处理/调试/优化
+# 錯誤處理/偵錯/優化
 
-* `[Doc]` Errors (异常)
+* `[Doc]` Errors (異常)
 * `[Doc]` Domain (域)
-* `[Doc]` Debugger (调试器)
-* `[Doc]` C/C++ 插件
+* `[Doc]` Debugger (偵錯程式)
+* `[Doc]` C/C++ 外掛
 * `[Doc]` V8
-* `[Point]` 内存快照
+* `[Point]` 記憶體快照
 * `[Point]` CPU剖析
 
 
 ## Errors
 
-在 Node.js 中的错误主要有一下四种类型：
+在 Node.js 中的錯誤主要有一下四種類型：
 
-|错误|名称|触发|
+|錯誤|名稱|觸發|
 |---|---|---|
-|Standard JavaScript errors|标准 JavaScript 错误|由错误代码触发|
-|System errors|系统错误|由操作系统触发|
-|User-specified errors|用户自定义错误|通过 throw 抛出|
-|Assertion errors|断言错误|由 `assert` 模块触发|
+|Standard JavaScript errors|標準 JavaScript 錯誤|由錯誤程式碼觸發|
+|System errors|系統錯誤|由作業系統觸發|
+|User-specified errors|使用者自定義錯誤|通過 throw 拋出|
+|Assertion errors|斷言錯誤|由 `assert` 模組觸發|
 
-其中标准的 JavaScript 错误常见有：
+其中標準的 JavaScript 錯誤常見有：
 
-* [EvalError](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/EvalError): 调用 eval() 出现错误时抛出该错误
-* [SyntaxError](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SyntaxError): 代码不符合 JavaScript 语法规范时抛出该错误
-* [RangeError](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RangeError): 数组越界时抛出该错误
-* [ReferenceError](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ReferenceError): 引用未定义的变量时抛出该错误
-* [TypeError](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError): 参数类型错误时抛出该错误
-* [URIError](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/URIError): 误用全局的 URI 处理函数时抛出该错误
+* [EvalError](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/EvalError): 呼叫 eval() 出現錯誤時拋出該錯誤
+* [SyntaxError](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SyntaxError): 程式碼不符合 JavaScript 語法規範時拋出該錯誤
+* [RangeError](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RangeError): 陣列越界時拋出該錯誤
+* [ReferenceError](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/ReferenceError): 引用未定義的變數時拋出該錯誤
+* [TypeError](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/TypeError): 參數類型錯誤時拋出該錯誤
+* [URIError](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/URIError): 誤用全局的 URI 處理函數時拋出該錯誤
 
-而常见的系统错误列表可以通过 Node.js 的 os 对象常看列表：
+而常見的系統錯誤列表可以通過 Node.js 的 os 物件常看列表：
 
 ```javascript
 const os = require('os');
@@ -37,50 +37,50 @@ const os = require('os');
 console.log(os.constants.errno);
 ```
 
-目前搜索 Node.js 面试题, 发现很多题目已经跟不上 Node.js 的发展了.比较老的 [NodeJS 错误处理最佳实践](https://cnodejs.org/topic/55714dfac4e7fbea6e9a2e5d), 译自 Joyent 的官方博客, 其中有这样的描述:
+目前搜尋 Node.js 面試題, 發現很多題目已經跟不上 Node.js 的發展了.比較老的 [NodeJS 錯誤處理最佳實踐](https://cnodejs.org/topic/55714dfac4e7fbea6e9a2e5d), 譯自 Joyent 的官方部落格, 其中有這樣的描述:
 
-> 实际上, `try/catch` 唯一常用的是在 `JSON.parse` 和类似验证用户输入的地方
+> 實際上, `try/catch` 唯一常用的是在 `JSON.parse` 和類似驗證使用者輸入的地方
 
-然而实际上现在在 Node.js 中你已经可以轻松的使用 try/catch 去捕获异步的异常了. 并且在 Node.js v7.6 之后使用了升级引擎的新版 v8, 旧版中 try/catch 代码不能优化的问题也解决了. 所以我们现在再来看
+然而實際上現在在 Node.js 中你已經可以輕鬆的使用 try/catch 去捕獲非同步的異常了. 並且在 Node.js v7.6 之後使用了升級引擎的新版 v8, 舊版中 try/catch 程式碼不能優化的問題也解決了. 所以我們現在再來看
 
-> <a name="q-handle-error"></a> 怎么处理未预料的出错? 用 try/catch , domains 还是其它什么?
+> <a name="q-handle-error"></a> 怎麼處理未預料的出錯? 用 try/catch , domains 還是其它什麼?
 
-在 Node.js 中错误处理主要有一下几种方法:
+在 Node.js 中錯誤處理主要有一下幾種方法:
 
-* callback(err, data) 回调约定
-* throw / try / catch 
+* callback(err, data) 回撥約定
+* throw / try / catch
 * EventEmitter 的 error 事件
 
-callback(err, data) 这种形式的错误处理起来繁琐, 并不具备强制性, 目前已经处于仅需要了解, 不推荐使用的情况. 而 domain 模块则是半只脚踏进棺材了.
+callback(err, data) 這種形式的錯誤處理起來繁瑣, 並不具備強制性, 目前已經處於僅需要了解, 不推薦使用的情況. 而 domain 模組則是半隻腳踏進棺材了.
 
-1) 感谢 [co](https://github.com/visionmedia/co) 的先河, 现在的你已经简单的使用 try/catch 保护关键的位置, 以 koa 为例, 可以通过中间件的形式来进行错误处理, 详见 [Koa error handling](https://github.com/koajs/koa/wiki/Error-Handling). 之后的 async/await 均属于这种模式.
+1) 感謝 [co](https://github.com/visionmedia/co) 的先河, 現在的你已經簡單的使用 try/catch 保護關鍵的位置, 以 koa 為例, 可以通過中介軟體的形式來進行錯誤處理, 詳見 [Koa error handling](https://github.com/koajs/koa/wiki/Error-Handling). 之後的 async/await 均屬於這種模式.
 
-2) 通过 EventEmitter 的错误监听形式为各大关键的对象加上错误监听的回调. 例如监听 http server, tcp server 等对象的 `error` 事件以及 process 对象提供的 `uncaughtException` 和 `unhandledRejection` 等等.
+2) 通過 EventEmitter 的錯誤監聽形式為各大關鍵的物件加上錯誤監聽的回撥. 例如監聽 http server, tcp server 等物件的 `error` 事件以及 process 物件提供的 `uncaughtException` 和 `unhandledRejection` 等等.
 
-3) 使用 Promise 来封装异步, 并通过 Promise 的错误处理来 handle 错误.
+3) 使用 Promise 來封裝非同步, 並通過 Promise 的錯誤處理來 handle 錯誤.
 
-4) 如果上述办法不能起到良好的作用, 那么你需要学习如何优雅的 [Let It Crash](http://wiki.c2.com/?LetItCrash)
+4) 如果上述辦法不能起到良好的作用, 那麼你需要學習如何優雅的 [Let It Crash](http://wiki.c2.com/?LetItCrash)
 
-> 为什么要在 cb 的第一参数传 error? 为什么有的 cb 第一个参数不是 error, 例如 http.createServer?
+> 為什麼要在 cb 的第一參數傳 error? 為什麼有的 cb 第一個參數不是 error, 例如 http.createServer?
 
 TODO
 
 
-### 错误栈丢失
+### 錯誤棧丟失
 
 ```javascript
 function test() {
   throw new Error('test error');
 }
 
-function main() {  
+function main() {
   test();
 }
 
 main();
 ```
 
-可以收获报错:
+可以收穫報錯:
 
 ```javascript
 /data/node-interview/error.js:2
@@ -100,16 +100,16 @@ Error: test error
     at run (bootstrap_node.js:394:7)
 ```
 
-可以发现报错的行数, test 函数, main 函数的调用关系都在 stack 中清晰的体现.
+可以發現報錯的行數, test 函數, main 函數的呼叫關係都在 stack 中清晰的體現.
 
-当你使用 setImmediate 等定时器来设置异步的时候:
+當你使用 setImmediate 等定時器來設定非同步的時候:
 
 ```javascript
 function test() {
   throw new Error('test error');
 }
 
-function main() {  
+function main() {
   setImmediate(() => test());
 }
 
@@ -117,7 +117,7 @@ main();
 
 ```
 
-我们发现
+我們發現
 
 ```javascript
 /data/node-interview/error.js:2
@@ -132,15 +132,15 @@ Error: test error
     at processImmediate [as _immediateCallback] (timers.js:582:5)
 ```
 
-错误栈中仅输出到 test 函数内调用的地方位置, 再往上 main 的调用信息就丢失了. 也就是说如果你的函数调用深度比较深的情况下, 你使用异步调用某个函数出错了的情况下追溯这个异步的调用是一个很困难的事情, 因为其之上的栈都已经丢失了. 如果你用过 [async](https://github.com/caolan/async) 之类的模块, 你还可能发现, 报错的 stack 会非常的长而且曲折, 光看 stack 很难去定位问题.
+錯誤棧中僅輸出到 test 函數內呼叫的地方位置, 再往上 main 的呼叫資訊就丟失了. 也就是說如果你的函數呼叫深度比較深的情況下, 你使用非同步呼叫某個函數出錯了的情況下追溯這個非同步的呼叫是一個很困難的事情, 因為其之上的棧都已經丟失了. 如果你用過 [async](https://github.com/caolan/async) 之類的模組, 你還可能發現, 報錯的 stack 會非常的長而且曲折, 光看 stack 很難去定位問題.
 
-这项目不大/作者清楚的情况下不是问题, 但是当项目大起来, 开发人员多起来之后, 这样追溯错误会变得异常痛苦. 关于这个问题, 在上文中提到 [错误处理的最佳实践](https://cnodejs.org/topic/55714dfac4e7fbea6e9a2e5d) 中, 关于 `编写新函数的具体建议` 那一带的内容有描述到. 通过使用 [verror](https://www.npmjs.com/package/verror) 这样的方式, 让 Error 一层层封装, 并在每一层将错误的信息一层层的包上, 最后拿到的 Error 直接可以从 message 中获取用于定位问题的关键信息.
+這項目不大/作者清楚的情況下不是問題, 但是當項目大起來, 開發人員多起來之後, 這樣追溯錯誤會變得異常痛苦. 關於這個問題, 在上文中提到 [錯誤處理的最佳實踐](https://cnodejs.org/topic/55714dfac4e7fbea6e9a2e5d) 中, 關於 `編寫新函數的具體建議` 那一帶的內容有描述到. 通過使用 [verror](https://www.npmjs.com/package/verror) 這樣的方式, 讓 Error 一層層封裝, 並在每一層將錯誤的資訊一層層的包上, 最後拿到的 Error 直接可以從 message 中獲取用於定位問題的關鍵資訊.
 
-以昨天的数据为准（2017-3-13）各位只要对比一下看看 npm 上上个月 [verror](https://www.npmjs.com/package/verror) 的下载量 `1100w` 比 [express](https://www.npmjs.com/package/express) 的 `1070w` 还高. 应该就能感受到这种写法有多流行了.
+以昨天的資料為準（2017-3-13）各位只要對比一下看看 npm 上上個月 [verror](https://www.npmjs.com/package/verror) 的下載量 `1100w` 比 [express](https://www.npmjs.com/package/express) 的 `1070w` 還高. 應該就能感受到這種寫法有多流行了.
 
-### 防御性编程
+### 防禦性程式設計
 
-错误并不可怕, 可怕的是你不去准备应对错误————[防御性编程的介绍和技巧](http://blog.jobbole.com/101651/)
+錯誤並不可怕, 可怕的是你不去準備應對錯誤————[防禦性程式設計的介紹和技巧](http://blog.jobbole.com/101651/)
 
 ### let it crash
 
@@ -148,7 +148,7 @@ Error: test error
 
 ### uncaughtException
 
-当异常没有被捕获一路冒泡到 Event Loop 时就会触发该事件 process 对象上的 `uncaughtException` 事件. 默认情况下, Node.js 对于此类异常会直接将其堆栈跟踪信息输出给 `stderr` 并结束进程, 而为 `uncaughtException` 事件添加监听可以覆盖该默认行为, 不会直接结束进程.
+當異常沒有被捕獲一路冒泡到 Event Loop 時就會觸發該事件 process 物件上的 `uncaughtException` 事件. 預設情況下, Node.js 對於此類異常會直接將其堆棧跟蹤資訊輸出給 `stderr` 並結束程序, 而為 `uncaughtException` 事件新增監聽可以覆蓋該預設行為, 不會直接結束程序.
 
 ```javascript
 process.on('uncaughtException', (err) => {
@@ -166,24 +166,24 @@ console.log('This will not run.');
 
 #### 合理使用 uncaughtException
 
-`uncaughtException` 的初衷是可以让你拿到错误之后可以做一些回收处理之后再 process.exit. 官方的同志们还曾经讨论过要移除该事件 (详见 [issues](https://github.com/nodejs/node-v0.x-archive/issues/2582))
+`uncaughtException` 的初衷是可以讓你拿到錯誤之後可以做一些回收處理之後再 process.exit. 官方的同志們還曾經討論過要移除該事件 (詳見 [issues](https://github.com/nodejs/node-v0.x-archive/issues/2582))
 
-所以你需要明白 `uncaughtException` 其实已经是非常规手段了, 应尽量避免使用它来处理错误. 因为通过该事件捕获到错误后, 并不代表 `你可以愉快的继续运行 (On Error Resume Next)`. 程序内部存在未处理的异常, 这意味着应用程序处于一种未知的状态. 如果不能适当的恢复其状态, 那么很有可能会触发不可预见的问题. (使用 domain 会很夸张的加剧这个现象, 并产生新人不能理解的各类幽灵问题)
+所以你需要明白 `uncaughtException` 其實已經是非常規手段了, 應儘量避免使用它來處理錯誤. 因為通過該事件捕獲到錯誤後, 並不代表 `你可以愉快的繼續執行 (On Error Resume Next)`. 程式內部存在未處理的異常, 這意味著應用程式處於一種未知的狀態. 如果不能適當的恢復其狀態, 那麼很有可能會觸發不可預見的問題. (使用 domain 會很誇張的加劇這個現象, 併產生新人不能理解的各類幽靈問題)
 
-如果在 `.on` 指定的监听回调中报错不会被捕获, Node.js 的进程会直接终端并返回一个非零的退出码, 最后输出相应的堆栈信息. 否则, 会出现无限递归. 除此之外, 内存崩溃/底层报错等情况也不会被捕获, **目前猜测**是 v8/C++ 那边撂担子不干了, Node.js 完全插不上话导致的 (TODO 整理到这里才想起来这个念头尚未验证, 如果有空的朋友帮忙验证下).
+如果在 `.on` 指定的監聽回撥中報錯不會被捕獲, Node.js 的程序會直接終端並返回一個非零的退出碼, 最後輸出相應的堆棧資訊. 否則, 會出現無限遞迴. 除此之外, 記憶體崩潰/底層報錯等情況也不會被捕獲, **目前猜測**是 v8/C++ 那邊撂擔子不幹了, Node.js 完全插不上話導致的 (TODO 整理到這裡才想起來這個念頭尚未驗證, 如果有空的朋友幫忙驗證下).
 
-所以官方建议的使用 `uncaughtException` 的正确姿势是在结束进程前使用同步的方式清理已使用的资源 (文件描述符、句柄等) 然后 process.exit. 
+所以官方建議的使用 `uncaughtException` 的正確姿勢是在結束程序前使用同步的方式清理已使用的資源 (檔案描述符、控制代碼等) 然後 process.exit.
 
-在 uncaughtException 事件之后执行普通的恢复操作并不安全. 官方建议是另外在专门准备一个 monitor 进程来做健康检查并通过 monitor 来管理恢复情况, 并在必要的时候重启 (所以官方是含蓄的提醒各位用 pm2 之类的工具).
+在 uncaughtException 事件之後執行普通的恢復操作並不安全. 官方建議是另外在專門準備一個 monitor 程序來做健康檢查並通過 monitor 來管理恢復情況, 並在必要的時候重啟 (所以官方是含蓄的提醒各位用 pm2 之類的工具).
 
 
 ### unhandledRejection
 
-当 Promise 被 reject 且没有绑定监听处理时, 就会触发该事件. 该事件对排查和追踪没有处理 reject 行为的 Promise 很有用.
+當 Promise 被 reject 且沒有繫結監聽處理時, 就會觸發該事件. 該事件對排查和追蹤沒有處理 reject 行為的 Promise 很有用.
 
-该事件的回调函数接收以下参数：
+該事件的回撥函數接收以下參數：
 
-* `reason` [`<Error>`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) | `<any>` 该 Promise 被 reject 的对象 (通常为 Error 对象)
+* `reason` [`<Error>`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) | `<any>` 該 Promise 被 reject 的物件 (通常為 Error 物件)
 * `p` 被 reject 的 Promise 本身
 
 例如
@@ -199,7 +199,7 @@ somePromise.then((res) => {
 }); // no `.catch` or `.then`
 ```
 
-以下代码也会触发 `unhandledRejection` 事件：
+以下程式碼也會觸發 `unhandledRejection` 事件：
 
 ```javascript
 function SomeResource() {
@@ -216,46 +216,46 @@ var resource = new SomeResource();
 
 ## Domain
 
-Node.js 早期, try/catch 无法捕获异步的错误, 而错误优先的 callback 仅仅是一种约定并没有强制性并且写起来十分繁琐. 所以为了能够很好的捕获异常, Node.js 从 v0.8 开始引入 domain 这个模块.
+Node.js 早期, try/catch 無法捕獲非同步的錯誤, 而錯誤優先的 callback 僅僅是一種約定並沒有強制性並且寫起來十分繁瑣. 所以為了能夠很好的捕獲異常, Node.js 從 v0.8 開始引入 domain 這個模組.
 
-domain 本身是一个 EventEmitter 对象, 其中文意思是 "域" 的意思, 捕获异步异常的基本思路是创建一个域, cb 函数会在定义时会继承上一层的域, 报错通过当前域的 `.emit('error', err)` 方法触发错误事件将错误传递上去, 从而使得异步错误可以被强制捕获. (更多内容详见 [Node.js 异步异常的处理与domain模块解析](https://cnodejs.org/topic/516b64596d38277306407936))
+domain 本身是一個 EventEmitter 物件, 其中文意思是 "域" 的意思, 捕獲非同步異常的基本思路是建立一個域, cb 函數會在定義時會繼承上一層的域, 報錯通過當前域的 `.emit('error', err)` 方法觸發錯誤事件將錯誤傳遞上去, 從而使得非同步錯誤可以被強制捕獲. (更多內容詳見 [Node.js 非同步異常的處理與domain模組解析](https://cnodejs.org/topic/516b64596d38277306407936))
 
-但是 domain 的引入也带来了更多新的问题. 比如依赖的模块无法继承你定义的 domain, 导致你写的 domain 无法 cover 依赖模块报错. 而且, 很多人 (特别是新人) 由于不了解 Node.js 的内存/异步流程等问题, 在使用 domain 处理报错的时候, 没有做到完善的处理并盲目的让代码继续走下去, 这很可能导致**项目完全无法维护** (可能出现的问题真是不胜枚举, 各种梦魇...)
+但是 domain 的引入也帶來了更多新的問題. 比如依賴的模組無法繼承你定義的 domain, 導致你寫的 domain 無法 cover 依賴模組報錯. 而且, 很多人 (特別是新人) 由於不瞭解 Node.js 的記憶體/非同步流程等問題, 在使用 domain 處理報錯的時候, 沒有做到完善的處理並盲目的讓程式碼繼續走下去, 這很可能導致**項目完全無法維護** (可能出現的問題真是不勝列舉, 各種夢魘...)
 
-该模块目前的情况: [deprecate domains](https://github.com/nodejs/node/issues/66)
+該模組目前的情況: [deprecate domains](https://github.com/nodejs/node/issues/66)
 
 
 ## Debugger
 
 ![node-js-survey-debug](/assets/node-js-survey-debug.png)
 
-类似 gdb 的命令行下 debug 工具 (上图中的 build-in debugger), 同时也支持远程 debug (类似 [node-inspector](https://github.com/node-inspector/node-inspector), 目前处于试验状态). 当然, 目前有不少同学觉得 [vscode](https://code.visualstudio.com/) 对 debug 工具集成的比较好.
+類似 gdb 的命令列下 debug 工具 (上圖中的 build-in debugger), 同時也支援遠端 debug (類似 [node-inspector](https://github.com/node-inspector/node-inspector), 目前處於試驗狀態). 當然, 目前有不少同學覺得 [vscode](https://code.visualstudio.com/) 對 debug 工具整合的比較好.
 
-关于这个 build-in debugger 使用推荐看[官方文档](https://nodejs.org/dist/latest-v6.x/docs/api/debugger.html). 如果要深入一点, 你可能对本文感兴趣: [动态修改 NodeJS 程序中的变量值](http://code.oneapm.com/nodejs/2015/06/27/intereference/)
+關於這個 build-in debugger 使用推薦看[官方文件](https://nodejs.org/dist/latest-v6.x/docs/api/debugger.html). 如果要深入一點, 你可能對本文感興趣: [動態修改 NodeJS 程式中的變數值](http://code.oneapm.com/nodejs/2015/06/27/intereference/)
 
 
 ## C/C++ Addon
 
-在 Node.js 中开发 addon 最痛苦的地方莫过于升级 V8 导致的 C/C++ 代码不能兼容的问题, 这个问题在很早就出现了. 为了解决这个问题前人开了一个叫 [nan](https://github.com/nodejs/nan) 的项目.
+在 Node.js 中開發 addon 最痛苦的地方莫過於升級 V8 導致的 C/C++ 程式碼不能相容的問題, 這個問題在很早就出現了. 為了解決這個問題前人開了一個叫 [nan](https://github.com/nodejs/nan) 的項目.
 
-要学习 addon 开发, 除了[官方文档](https://nodejs.org/docs/latest/api/addons.html)也推荐阅读这个: https://github.com/nodejs/node-addon-examples
+要學習 addon 開發, 除了[官方文件](https://nodejs.org/docs/latest/api/addons.html)也推薦閱讀這個: https://github.com/nodejs/node-addon-examples
 
 
 ## V8
 
-这里并不是介绍 V8, 而是介绍 Node.js 中的 V8 这个模块. 该模块用于开放 Node.js 内建的 V8 引擎的事件和接口. 这些接口由 V8 底层决定, 所以无法保证绝对的稳定性.
+這裡並不是介紹 V8, 而是介紹 Node.js 中的 V8 這個模組. 該模組用於開放 Node.js 內建的 V8 引擎的事件和介面. 這些介面由 V8 底層決定, 所以無法保證絕對的穩定性.
 
-|接口|描述|
+|介面|描述|
 |---|---|
-|v8.getHeapStatistics()|获取 heap 信息|
-|v8.getHeapSpaceStatistics()|获取 heap space 信息|
-|v8.setFlagsFromString(string)|动态设置 V8 options|
+|v8.getHeapStatistics()|獲取 heap 資訊|
+|v8.getHeapSpaceStatistics()|獲取 heap space 資訊|
+|v8.setFlagsFromString(string)|動態設定 V8 options|
 
 ### v8.setFlagsFromString(string)
 
-该方法用于添加额外的 V8 命令行标志. 该方法需谨慎使用, 在 VM 启动后修改配置可能会发生不可预测的行为、崩溃和数据丢失; 或者什么反应都没有.
+該方法用於新增額外的 V8 命令列標誌. 該方法需謹慎使用, 在 VM 啟動後修改配置可能會發生不可預測的行為、崩潰和資料丟失; 或者什麼反應都沒有.
 
-通过 `node --v8-options` 命令可以查询当前 Node.js 环境中有哪些可用的 V8 options. 此外, 还可以参考非官方维护的一个 [V8 options 列表](https://github.com/thlorenz/v8-flags/blob/master/flags-0.11.md).
+通過 `node --v8-options` 命令可以查詢當前 Node.js 環境中有哪些可用的 V8 options. 此外, 還可以參考非官方維護的一個 [V8 options 列表](https://github.com/thlorenz/v8-flags/blob/master/flags-0.11.md).
 
 用法:
 
@@ -266,31 +266,31 @@ v8.setFlagsFromString('--trace_gc');
 setTimeout(function() { v8.setFlagsFromString('--notrace_gc'); }, 60e3);
 ```
 
-## 内存快照
+## 記憶體快照
 
-内存快照常用与解决内存泄漏的问题. 快照工具推荐使用 [heapdump](https://github.com/bnoordhuis/node-heapdump) 用来保存内存快照, 使用 [devtool](https://github.com/Jam3/devtool) 来查看内存快照. 使用 heapdump 保存内存快照时, 只会有 Node.js 环境中的对象, 不会受到干扰（如果使用 [node-inspector](https://github.com/node-inspector/node-inspector) 的话, 快照中会有前端的变量干扰）.
+記憶體快照常用與解決記憶體洩漏的問題. 快照工具推薦使用 [heapdump](https://github.com/bnoordhuis/node-heapdump) 用來儲存記憶體快照, 使用 [devtool](https://github.com/Jam3/devtool) 來檢視記憶體快照. 使用 heapdump 儲存記憶體快照時, 只會有 Node.js 環境中的物件, 不會受到干擾（如果使用 [node-inspector](https://github.com/node-inspector/node-inspector) 的話, 快照中會有前端的變數干擾）.
 
-使用以及内存泄漏的常见原因详见: [如何分析 Node.js 中的内存泄漏](https://zhuanlan.zhihu.com/p/25736931?group_id=825001468703674368).
+使用以及記憶體洩漏的常見原因詳見: [如何分析 Node.js 中的記憶體洩漏](https://zhuanlan.zhihu.com/p/25736931?group_id=825001468703674368).
 
 ## CPU profiling
 
-CPU profiling (剖析) 常用于性能优化. 有许多用于做 profiling 的第三方工具, 但是大部分情况下, 使用 Node.js 内置的是最简单的. 其内置调用的就是 [V8 本身的 profiler](https://github.com/v8/v8/wiki/Using%20V8%E2%80%99s%20internal%20profiler), 它可以在程序执行过程中中是对 stack 间隔性的抽样分析.
+CPU profiling (剖析) 常用於效能優化. 有許多用於做 profiling 的第三方工具, 但是大部分情況下, 使用 Node.js 內建的是最簡單的. 其內建呼叫的就是 [V8 本身的 profiler](https://github.com/v8/v8/wiki/Using%20V8%E2%80%99s%20internal%20profiler), 它可以在程式執行過程中中是對 stack 間隔性的抽樣分析.
 
-使用 `--prof` 开启内置的 profilling
+使用 `--prof` 開啟內建的 profilling
 
 ```shell
 node --prof app.js
 ```
 
-程序运行之后会生成一个 `isolate-0xnnnnnnnnnnnn-v8.log` 在当前运行目录. 
+程式執行之後會生成一個 `isolate-0xnnnnnnnnnnnn-v8.log` 在當前執行目錄.
 
-你可以使用 `--prof-process` 来生成报告查看
+你可以使用 `--prof-process` 來生成報告檢視
 
 ```
 node --prof-process isolate-0xnnnnnnnnnnnn-v8.log
 ```
 
-报告形如:
+報告形如:
 
 ```
 Statistical profiling result from isolate-0x103001200-v8.log, (12042 ticks, 2634 unaccounted, 0 excluded).
@@ -359,11 +359,10 @@ Statistical profiling result from isolate-0x103001200-v8.log, (12042 ticks, 2634
 	 ...
 ```
 
-|字段|描述|
+|欄位|描述|
 |---|---|
-|ticks|时间片|
-|total|当前操作执行的时间占总时间的比率|
-|nonlib|当前非 System library 执行时间比率|
+|ticks|時間片|
+|total|當前操作執行的時間佔總時間的比率|
+|nonlib|當前非 System library 執行時間比率|
 
 整理中
-

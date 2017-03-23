@@ -1,219 +1,219 @@
 ![ElemeFE-background](assets/ElemeFE-background.png)
 
-# 如何通过饿了么 Node.js 面试
+# 如何通過餓了麼 Node.js 面試
 
-Hi, 欢迎来到 ElemeFE, 如标题所示本教程的目的是教你如何通过饿了么大前端的面试, 职位是 2~3 年经验的 Node.js 服务端程序员 (并不是全栈), 如果你对这个职位感兴趣或者学习 Node.js 一些进阶的内容, 那么欢迎围观.
+Hi, 歡迎來到 ElemeFE, 如標題所示本教程的目的是教你如何通過餓了麼大前端的面試, 職位是 2~3 年經驗的 Node.js 服務端程式設計師 (並不是全棧), 如果你對這個職位感興趣或者學習 Node.js 一些進階的內容, 那麼歡迎圍觀.
 
-需要注意的是, 本文针对的并不是零基础的同学, 你需要有一定的 JavaScript/Node.js 基础, 并且有一定的工作经验. 另外本教程的重点更准确的说是服务端基础中 Node.js 程序员需要了解的部分.
+需要注意的是, 本文針對的並不是零基礎的同學, 你需要有一定的 JavaScript/Node.js 基礎, 並且有一定的工作經驗. 另外本教程的重點更準確的說是服務端基礎中 Node.js 程式設計師需要了解的部分.
 
-如果你觉得大多不了解, 就不用投简历了 <del>(这样两边都节约了时间)</del>, 如果你觉得大都有了解或者**光看大纲都都觉得很简单那么欢迎投递简历至 ElemeFe (fe.job@ele.me)**.
+如果你覺得大多不瞭解, 就不用投簡歷了 <del>(這樣兩邊都節約了時間)</del>, 如果你覺得大都有了解或者**光看大綱都都覺得很簡單那麼歡迎投遞簡歷至 ElemeFe (fe.job@ele.me)**.
 
-## 导读
+## 導讀
 
-虽然说目的是要通过面试, 但是本教程并不是简单的把所有面试题列出来, 而**主要是将面试中需要确认你是否懂的点列举出来**, 并进行一定程度的讨论.
+雖然說目的是要通過面試, 但是本教程並不是簡單的把所有面試題列出來, 而**主要是將面試中需要確認你是否懂的點列舉出來**, 並進行一定程度的討論.
 
-本文将一些常见的问题划分归类, 每类标明涵盖的一些`覆盖点`, 并且列举几个`常见问题`, 通常这些问题都是 2~3 年工作经验需要了解或者面对的. 如果你对某类问题感兴趣, 或者想知道其中列举问题的答案, 可以通过该类下方的 `阅读更多` 查看更多的内容.
+本文將一些常見的問題劃分歸類, 每類標明涵蓋的一些`覆蓋點`, 並且列舉幾個`常見問題`, 通常這些問題都是 2~3 年工作經驗需要了解或者面對的. 如果你對某類問題感興趣, 或者想知道其中列舉問題的答案, 可以通過該類下方的 `閱讀更多` 檢視更多的內容.
 
-整体上大纲列举的并不是很全面, 细节上覆盖率不高, 很多讨论只是点到即止, 希望大家带着问题去思考.
+整體上大綱列舉的並不是很全面, 細節上覆蓋率不高, 很多討論只是點到即止, 希望大家帶著問題去思考.
 
-## [Js 基础问题](sections/js-basic.md)
+## [Js 基礎問題](sections/js-basic.md)
 
-> 与前端 Js 不同, 后端是直面服务器的, 更加偏向内存方面.
+> 與前端 Js 不同, 後端是直面伺服器的, 更加偏向記憶體方面.
 
-* [`[Basic]` 类型判断](sections/js-basic.md#类型判断)
+* [`[Basic]` 類型判斷](sections/js-basic.md#類型判斷)
 * [`[Basic]` 作用域](sections/js-basic.md#作用域)
-* [`[Basic]` 引用传递](sections/js-basic.md#引用传递)
-* [`[Basic]` 内存释放](sections/js-basic.md#内存释放)
+* [`[Basic]` 引用傳遞](sections/js-basic.md#引用傳遞)
+* [`[Basic]` 記憶體釋放](sections/js-basic.md#記憶體釋放)
 * [`[Basic]` ES6 新特性](sections/js-basic.md#es6-新特性)
 
-### 常见问题
+### 常見問題
 
-* js 中什么类型是引用传递, 什么类型是值传递? 如何将值类型的变量以引用的方式传递? [[more]](sections/js-basic.md#q-value)
-* js 中， 0.1 + 0.2 === 0.3 是否为 true ? 在不知道浮点数位数时应该怎样判断两个浮点数之和与第三数是否相等？
-* const 定义的 Array 中间元素能否被修改? 如果可以, 那 const 修饰对象的意义是? [[more]](sections/js-basic.md#q-const)
-* JavaScript 中不同类型以及不同环境下变量的内存都是何时释放? [[more]](sections/js-basic.md#q-mem)
+* js 中什麼類型是引用傳遞, 什麼類型是值傳遞? 如何將值類型的變數以引用的方式傳遞? [[more]](sections/js-basic.md#q-value)
+* js 中， 0.1 + 0.2 === 0.3 是否為 true ? 在不知道浮點數位數時應該怎樣判斷兩個浮點數之和與第三數是否相等？
+* const 定義的 Array 中間元素能否被修改? 如果可以, 那 const 修飾物件的意義是? [[more]](sections/js-basic.md#q-const)
+* JavaScript 中不同類型以及不同環境下變數的記憶體都是何時釋放? [[more]](sections/js-basic.md#q-mem)
 
-[阅读更多](sections/js-basic.md)
+[閱讀更多](sections/js-basic.md)
 
-## [模块](sections/module.md)
+## [模組](sections/module.md)
 
-* [`[Basic]` 模块机制](sections/module.md#模块机制)
-* [`[Basic]` 热更新](sections/module.md#热更新)
+* [`[Basic]` 模組機制](sections/module.md#模組機制)
+* [`[Basic]` 熱更新](sections/module.md#熱更新)
 * [`[Basic]` 上下文](sections/module.md#上下文)
 
-### 常见问题
+### 常見問題
 
-* a.js 和 b.js 两个文件互相 require 是否会死循环? 双方是否能导出变量? 如何从设计上避免这种问题? [[more]](sections/module.md#q-loop)
-* 如果 a.js require 了 b.js, 那么在 b 中定义全局变量 `t = 111` 能否在 a 中直接打印出来? [[more]](sections/module.md#q-global)
-* 如何在不重启 node 进程的情况下热更新一个 js/json 文件? 这个问题本身是否有问题? [[more]](sections/module.md#q-hot)
+* a.js 和 b.js 兩個檔案互相 require 是否會死迴圈? 雙方是否能匯出變數? 如何從設計上避免這種問題? [[more]](sections/module.md#q-loop)
+* 如果 a.js require 了 b.js, 那麼在 b 中定義全局變數 `t = 111` 能否在 a 中直接列印出來? [[more]](sections/module.md#q-global)
+* 如何在不重啟 node 程序的情況下熱更新一個 js/json 檔案? 這個問題本身是否有問題? [[more]](sections/module.md#q-hot)
 
-[阅读更多](sections/module.md)
+[閱讀更多](sections/module.md)
 
-## [事件/异步](sections/event-async.md)
+## [事件/非同步](sections/event-async.md)
 
 * [`[Basic]` Promise](sections/event-async.md#promise)
 * [`[Doc]` Events (事件)](sections/event-async.md#events)
-* [`[Doc]` Timers (定时器)](sections/event-async.md#timers)
-* [`[Point]` 阻塞/异步](sections/event-async.md#阻塞异步)
-* [`[Point]` 并行/并发](sections/event-async.md#并行并发)
+* [`[Doc]` Timers (定時器)](sections/event-async.md#timers)
+* [`[Point]` 阻塞/非同步](sections/event-async.md#阻塞非同步)
+* [`[Point]` 並行/併發](sections/event-async.md#並行併發)
 
-### 常见问题
+### 常見問題
 
-* Promise 中 .then 的第二参数与 .catch 有什么区别? [[more]](sections/event-async.md#q-1)
-* Eventemitter 的 emit 是同步还是异步? [[more]](sections/event-async.md#q-2)
-* 如何判断接口是否异步? 是否只要有回调函数就是异步? [[more]](sections/event-async.md#q-3)
-* nextTick, setTimeout 以及 setImmediate 三者有什么区别? [[more]](sections/event-async.md#q-4)
-* 如何实现一个 sleep 函数? [[more]](sections/event-async.md#q-5)
-* 如何实现一个异步的 reduce? (注:不是异步完了之后同步 reduce) [[more]](sections/event-async.md#q-6)
+* Promise 中 .then 的第二參數與 .catch 有什麼區別? [[more]](sections/event-async.md#q-1)
+* Eventemitter 的 emit 是同步還是非同步? [[more]](sections/event-async.md#q-2)
+* 如何判斷介面是否非同步? 是否只要有回撥函數就是非同步? [[more]](sections/event-async.md#q-3)
+* nextTick, setTimeout 以及 setImmediate 三者有什麼區別? [[more]](sections/event-async.md#q-4)
+* 如何實現一個 sleep 函數? [[more]](sections/event-async.md#q-5)
+* 如何實現一個非同步的 reduce? (注:不是非同步完了之後同步 reduce) [[more]](sections/event-async.md#q-6)
 
-[阅读更多](sections/event-async.md)
+[閱讀更多](sections/event-async.md)
 
-## [进程](sections/process.md)
+## [程序](sections/process.md)
 
-* [`[Doc]` Process (进程)](sections/process.md#process)
-* [`[Doc]` Child Processes (子进程)](sections/process.md#child-process)
-* [`[Doc]` Cluster (集群)](sections/process.md#cluster)
-* [`[Basic]` 进程间通信](sections/process.md#进程间通信)
-* [`[Basic]` 守护进程](sections/process.md#守护进程)
+* [`[Doc]` Process (程序)](sections/process.md#process)
+* [`[Doc]` Child Processes (子程序)](sections/process.md#child-process)
+* [`[Doc]` Cluster (叢集)](sections/process.md#cluster)
+* [`[Basic]` 程序間通訊](sections/process.md#程序間通訊)
+* [`[Basic]` 守護程序](sections/process.md#守護程序)
 
-### 常见问题
+### 常見問題
 
-* 进程的当前工作目录是什么? 有什么作用? [[more]](sections/process.md#q-cwd)
-* child_process.fork 与 POSIX 的 fork 有什么区别? [[more]](sections/process.md#q-fork)
-* 父进程或子进程的死亡是否会影响对方? 什么是孤儿进程? [[more]](sections/process.md#q-child)
-* cluster 是如何保证负载均衡的? [[more]](sections/process.md#how-it-works)
-* 什么是守护进程? 如何实现守护进程? [[more]](sections/process.md#守护进程)
+* 程序的當前工作目錄是什麼? 有什麼作用? [[more]](sections/process.md#q-cwd)
+* child_process.fork 與 POSIX 的 fork 有什麼區別? [[more]](sections/process.md#q-fork)
+* 父程序或子程序的死亡是否會影響對方? 什麼是孤兒程序? [[more]](sections/process.md#q-child)
+* cluster 是如何保證負載均衡的? [[more]](sections/process.md#how-it-works)
+* 什麼是守護程序? 如何實現守護程序? [[more]](sections/process.md#守護程序)
 
-[阅读更多](sections/process.md)
+[閱讀更多](sections/process.md)
 
 
 ## [IO](sections/io.md)
 
 * [`[Doc]` Buffer](sections/io.md#buffer)
-* [`[Doc]` String Decoder (字符串解码)](sections/io.md#string-decoder)
+* [`[Doc]` String Decoder (字元串解碼)](sections/io.md#string-decoder)
 * [`[Doc]` Stream (流)](sections/io.md#stream)
-* [`[Doc]` Console (控制台)](sections/io.md#console)
-* [`[Doc]` File System (文件系统)](sections/io.md#file)
+* [`[Doc]` Console (控制檯)](sections/io.md#console)
+* [`[Doc]` File System (檔案系統)](sections/io.md#file)
 * [`[Doc]` Readline](sections/io.md#readline)
 * [`[Doc]` REPL](sections/io.md#repl)
 
-### 常见问题
+### 常見問題
 
-* Buffer 一般用于处理什么数据? 其长度能否动态变化? [[more]](sections/io.md#buffer)
-* Stream 的 highWaterMark 与 drain 事件是什么? 二者之间的关系是? [[more]](sections/io.md#缓冲区)
-* Stream 的 pipe 的作用是? 在 pipe 的过程中数据是引用传递还是拷贝传递? [[more]](sections/io.md#pipe)
-* 什么是文件描述符? 输入流/输出流/错误流是什么? [[more]](sections/io.md#file)
-* console.log 是同步还是异步? 如何实现一个 console.log? [[more]](sections/io.md#console)
-* 如何同步的获取用户的输入?  [[more]](sections/io.md#如何同步的获取用户的输入)
-* Readline 是如何实现的? (有思路即可) [[more]](sections/io.md#readline)
+* Buffer 一般用於處理什麼資料? 其長度能否動態變化? [[more]](sections/io.md#buffer)
+* Stream 的 highWaterMark 與 drain 事件是什麼? 二者之間的關係是? [[more]](sections/io.md#緩衝區)
+* Stream 的 pipe 的作用是? 在 pipe 的過程中資料是引用傳遞還是拷貝傳遞? [[more]](sections/io.md#pipe)
+* 什麼是檔案描述符? 輸入流/輸出流/錯誤流是什麼? [[more]](sections/io.md#file)
+* console.log 是同步還是非同步? 如何實現一個 console.log? [[more]](sections/io.md#console)
+* 如何同步的獲取使用者的輸入?  [[more]](sections/io.md#如何同步的獲取使用者的輸入)
+* Readline 是如何實現的? (有思路即可) [[more]](sections/io.md#readline)
 
-[阅读更多](sections/io.md)
+[閱讀更多](sections/io.md)
 
 ## [Network](sections/network.md)
 
-* [`[Doc]` Net (网络)](sections/network.md#net)
+* [`[Doc]` Net (網路)](sections/network.md#net)
 * [`[Doc]` UDP/Datagram](sections/network.md#udp)
 * [`[Doc]` HTTP](sections/network.md#http)
-* [`[Doc]` DNS (域名服务器)](sections/network.md#dns)
-* [`[Doc]` ZLIB (压缩)](sections/network.md#zlib)
+* [`[Doc]` DNS (域名伺服器)](sections/network.md#dns)
+* [`[Doc]` ZLIB (壓縮)](sections/network.md#zlib)
 * [`[Point]` RPC](sections/network.md#rpc)
 
-### 常见问题
+### 常見問題
 
-* cookie 与 session 的区别? 服务端如何清除 cookie? [[more]](sections/network.md#q-cookie-session)
-* HTTP 协议中的 POST 和 PUT 有什么区别? [[more]](sections/network.md#q-post-put)
-* 什么是跨域请求? 如何允许跨域? [[more]](sections/network.md#q-cors)
-* TCP/UDP 的区别? TCP 粘包是怎么回事，如何处理? UDP 有粘包吗? [[more]](sections/network.md#q-tcp-udp)
-* `TIME_WAIT` 是什么情况? 出现过多的 `TIME_WAIT` 可能是什么原因? [[more]](sections/network.md#q-time-wait)
-* ECONNRESET 是什么错误? 如何复现这个错误?
-* socket hang up 是什么意思? 可能在什么情况下出现? [[more]](sections/network.md#socket-hang-up)
-* hosts 文件是什么? 什么叫 DNS 本地解析?
-* 列举几个提高网络传输速度的办法?
+* cookie 與 session 的區別? 服務端如何清除 cookie? [[more]](sections/network.md#q-cookie-session)
+* HTTP 協議中的 POST 和 PUT 有什麼區別? [[more]](sections/network.md#q-post-put)
+* 什麼是跨域請求? 如何允許跨域? [[more]](sections/network.md#q-cors)
+* TCP/UDP 的區別? TCP 粘包是怎麼回事，如何處理? UDP 有粘包嗎? [[more]](sections/network.md#q-tcp-udp)
+* `TIME_WAIT` 是什麼情況? 出現過多的 `TIME_WAIT` 可能是什麼原因? [[more]](sections/network.md#q-time-wait)
+* ECONNRESET 是什麼錯誤? 如何復現這個錯誤?
+* socket hang up 是什麼意思? 可能在什麼情況下出現? [[more]](sections/network.md#socket-hang-up)
+* hosts 檔案是什麼? 什麼叫 DNS 本地解析?
+* 列舉幾個提高網路傳輸速度的辦法?
 
-[阅读更多](sections/network.md)
+[閱讀更多](sections/network.md)
 
 ## [OS](sections/os.md)
 
 * [`[Doc]` TTY](sections/os.md#tty)
-* [`[Doc]` OS (操作系统)](sections/os.md#os-1)
-* [`[Doc]` 命令行参数](sections/os.md#命令行参数)
-* [`[Basic]` 负载](sections/os.md#负载)
+* [`[Doc]` OS (作業系統)](sections/os.md#os-1)
+* [`[Doc]` 命令列參數](sections/os.md#命令列參數)
+* [`[Basic]` 負載](sections/os.md#負載)
 * [`[Point]` CheckList](sections/os.md#checklist)
 
-### 常见问题
+### 常見問題
 
-* 什么是 TTY? 如何判断是否处于 TTY 环境? [[more]](sections/os.md#tty)
-* 不同操作系统的换行符 (EOL) 有什么区别? [[more]](sections/os.md#os)
-* 服务器负载是什么概念? 如何查看负载? [[more]](sections/os.md#负载)
-* ulimit 是用来干什么的? [[more]](sections/os.md#ulimit)
+* 什麼是 TTY? 如何判斷是否處於 TTY 環境? [[more]](sections/os.md#tty)
+* 不同作業系統的換行符 (EOL) 有什麼區別? [[more]](sections/os.md#os)
+* 伺服器負載是什麼概念? 如何檢視負載? [[more]](sections/os.md#負載)
+* ulimit 是用來幹什麼的? [[more]](sections/os.md#ulimit)
 
-[阅读更多](sections/os.md)
+[閱讀更多](sections/os.md)
 
-## [错误处理/调试/优化](sections/error.md)
+## [錯誤處理/偵錯/優化](sections/error.md)
 
-* [`[Doc]` Errors (异常)](sections/error.md#errors)
+* [`[Doc]` Errors (異常)](sections/error.md#errors)
 * [`[Doc]` Domain (域)](sections/error.md#domain)
-* [`[Doc]` Debugger (调试器)](sections/error.md#debugger)
-* [`[Doc]` C/C++ 插件](sections/error.md#c-c++-addon)
+* [`[Doc]` Debugger (偵錯程式)](sections/error.md#debugger)
+* [`[Doc]` C/C++ 外掛](sections/error.md#c-c++-addon)
 * [`[Doc]` V8](sections/error.md#v8)
-* [`[Point]` 内存快照](sections/error.md#内存快照)
+* [`[Point]` 記憶體快照](sections/error.md#記憶體快照)
 * [`[Point]` CPU profiling](sections/error.md#cpu-profiling)
 
-### 常见问题
+### 常見問題
 
-* 怎么处理未预料的出错? 用 try/catch ，domains 还是其它什么? [[more]](sections/error.md#q-handle-error)
-* 什么是 `uncaughtException` 事件? 一般在什么情况下使用该事件? [[more]](sections/error.md#uncaughtexception)
-* domain 的原理是? 为什么要弃用 domain? [[more]](sections/error.md#domain)
-* 什么是防御性编程? 与其相对的 let it crash 又是什么?
-* 为什么要在 cb 的第一参数传 error? 为什么有的 cb 第一个参数不是 error, 例如 http.createServer?
-* 为什么有些异常没法根据报错信息定位到代码调用? 如何准确的定位一个异常? [[more]](sections/error.md#错误栈丢失)
-* 内存泄漏通常由哪些原因导致? 如何分析以及定位内存泄漏? [[more]](sections/error.md#内存快照)
+* 怎麼處理未預料的出錯? 用 try/catch ，domains 還是其它什麼? [[more]](sections/error.md#q-handle-error)
+* 什麼是 `uncaughtException` 事件? 一般在什麼情況下使用該事件? [[more]](sections/error.md#uncaughtexception)
+* domain 的原理是? 為什麼要棄用 domain? [[more]](sections/error.md#domain)
+* 什麼是防禦性程式設計? 與其相對的 let it crash 又是什麼?
+* 為什麼要在 cb 的第一參數傳 error? 為什麼有的 cb 第一個參數不是 error, 例如 http.createServer?
+* 為什麼有些異常沒法根據報錯資訊定位到程式碼呼叫? 如何準確的定位一個異常? [[more]](sections/error.md#錯誤棧丟失)
+* 記憶體洩漏通常由哪些原因導致? 如何分析以及定位記憶體洩漏? [[more]](sections/error.md#記憶體快照)
 
-[阅读更多](sections/error.md)
+[閱讀更多](sections/error.md)
 
-## [测试](sections/test.md)
+## [測試](sections/test.md)
 
-* [`[Basic]` 测试方法](sections/test.md#测试方法)
-* [`[Basic]` 单元测试](sections/test.md#单元测试)
-* [`[Basic]` 集成测试](sections/test.md#集成测试)
-* [`[Basic]` 基准测试](sections/test.md#基准测试)
-* [`[Basic]` 压力测试](sections/test.md#压力测试)
-* [`[Doc]` Assert (断言)](sections/test.md#assert)
+* [`[Basic]` 測試方法](sections/test.md#測試方法)
+* [`[Basic]` 單元測試](sections/test.md#單元測試)
+* [`[Basic]` 整合測試](sections/test.md#整合測試)
+* [`[Basic]` 基準測試](sections/test.md#基準測試)
+* [`[Basic]` 壓力測試](sections/test.md#壓力測試)
+* [`[Doc]` Assert (斷言)](sections/test.md#assert)
 
-### 常见问题
+### 常見問題
 
-* [为什么要写测试? 写测试是否会拖累开发进度?](sections/test.md#q-why-write-test)
-* [单元测试的单元是指什么? 什么是覆盖率?](sections/test.md#单元测试)
-* [测试是如何保证业务逻辑中不会出现死循环的?](sections/test.md#q-death-loop)
-* [mock 是什么? 一般在什么情况下 mock?](sections/test.md#mock)
+* [為什麼要寫測試? 寫測試是否會拖累開發進度?](sections/test.md#q-why-write-test)
+* [單元測試的單元是指什麼? 什麼是覆蓋率?](sections/test.md#單元測試)
+* [測試是如何保證業務邏輯中不會出現死迴圈的?](sections/test.md#q-death-loop)
+* [mock 是什麼? 一般在什麼情況下 mock?](sections/test.md#mock)
 
-[阅读更多](sections/test.md)
+[閱讀更多](sections/test.md)
 
 ## util
 
 * `[Doc]` URL
-* `[Doc]` Path (路径)
-* `[Doc]` Utilities (实用函数)
-* `[Doc]` Query Strings (查询字符串)
-* `[Basic]` 正则表达式
+* `[Doc]` Path (路徑)
+* `[Doc]` Utilities (實用函數)
+* `[Doc]` Query Strings (查詢字元串)
+* `[Basic]` 正規表示式
 
-* 如何获取某个文件夹下所有的文件名?
+* 如何獲取某個資料夾下所有的檔名?
 
 `更多整理中`
 
-## 存储
+## 儲存
 
 * `[Point]` Sql
 * `[Point]` NoSql
-* `[Point]` 缓存
-* `[Point]` 数据一致性
+* `[Point]` 快取
+* `[Point]` 資料一致性
 
-### 常见问题
+### 常見問題
 
-* 索引有什么用，大致原理是什么?设计索引有什么注意点?
-* Session/Cookie 有什么区别?
-* 连接超时有可能是什么问题导致的?
-* 什么情况下数据会出现脏读? 如何避免?
+* 索引有什麼用，大致原理是什麼?設計索引有什麼注意點?
+* Session/Cookie 有什麼區別?
+* 連線超時有可能是什麼問題導致的?
+* 什麼情況下資料會出現髒讀? 如何避免?
 
 `更多整理中`
 
@@ -223,20 +223,20 @@ Hi, 欢迎来到 ElemeFE, 如标题所示本教程的目的是教你如何通过
 * `[Doc]` TLS/SSL
 * `[Point]` XSS
 * `[Point]` CSRF
-* `[Point]` 中间人攻击
-* `[Point]` Sql/Nosql 注入攻击
+* `[Point]` 中間人攻擊
+* `[Point]` Sql/Nosql 注入攻擊
 * `[Doc]` Crypto (加密)
 
-### 常见问题
+### 常見問題
 
-* CSRF 的攻击和防范方法?
-* 加密如何保证用户密码的安全性?
-* 如何避免中间人攻击?
+* CSRF 的攻擊和防範方法?
+* 加密如何保證使用者密碼的安全性?
+* 如何避免中間人攻擊?
 
 `更多整理中`
 
-## 最后
+## 最後
 
-目前 repo 处于施工现场的情况，如果发现问题欢迎在 [issues](https://github.com/ElemeFE/node-interview/issues) 中指出。如果有比较好的问题/知识点/指正，也欢迎提 PR。
+目前 repo 處於施工現場的情況，如果發現問題歡迎在 [issues](https://github.com/ElemeFE/node-interview/issues) 中指出。如果有比較好的問題/知識點/指正，也歡迎提 PR。
 
-另外关于 Js 基础 是个比较大的话题，在本教程不会很细致深入的讨论，更多的是列出一些重要或者跟服务端更相关的地方，所以如果你拿着《JavaScript 权威指南》给教程提 PR 可能不会采纳。本教程的重点更准确的说是服务端基础中 Node.js 程序员需要了解的部分。
+另外關於 Js 基礎 是個比較大的話題，在本教程不會很細緻深入的討論，更多的是列出一些重要或者跟服務端更相關的地方，所以如果你拿著《JavaScript 權威指南》給教程提 PR 可能不會採納。本教程的重點更準確的說是服務端基礎中 Node.js 程式設計師需要了解的部分。
